@@ -2,3 +2,4 @@ django-heroku
 discord.py
 youtube_dl
 PyNaCl
+aiohttp
