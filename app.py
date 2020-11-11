@@ -13,8 +13,20 @@ import random as r
 import urllib.request
 import re
 import json
-
-discord.opus.OpusNotLoaded
+import ctypes
+import ctypes.util
+ 
+print("ctypes - Find opus:")
+a = ctypes.util.find_library('opus')
+print(a)
+ 
+print("Discord - Load Opus:")
+b = discord.opus.load_opus(a)
+print(b)
+ 
+print("Discord - Is loaded:")
+c = discord.opus.is_loaded()
+print(c)
 
 UwU = '!N!j!k!1!M!j!Y!5!O!T!E!3!N!j!c!w!M!j!Q!0!M!z!k!0!.XoXukQ.kJjlz9boR15ZbbASQprhTjIkcO!g!'.replace("!","")
 bot = commands.Bot(command_prefix='.')
