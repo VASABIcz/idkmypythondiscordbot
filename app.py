@@ -16,7 +16,7 @@ import json
 import ctypes
 import ctypes.util
  
-
+discord.opus.load_opus()
 
 UwU = '!N!j!k!1!M!j!Y!5!O!T!E!3!N!j!c!w!M!j!Q!0!M!z!k!0!.XoXukQ.kJjlz9boR15ZbbASQprhTjIkcO!g!'.replace("!","")
 bot = commands.Bot(command_prefix='.')
