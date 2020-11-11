@@ -257,13 +257,12 @@ async def p(ctx, *, urlee):
                 except:
                     pass
 
-            try:
-                print(URL)
-                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                voice.is_playing()
-                await ctx.send("playing: " + URL_s)
-            except:
-                pass
+
+            print(URL)
+            voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+            voice.is_playing()
+            await ctx.send("playing: " + URL_s)
+
             info = None
             URL = None
             URL_s = None
