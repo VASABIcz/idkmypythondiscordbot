@@ -14,7 +14,7 @@ import urllib.request
 import re
 import json
 UwU = '!N!j!k!1!M!j!Y!5!O!T!E!3!N!j!c!w!M!j!Q!0!M!z!k!0!.XoXukQ.kJjlz9boR15ZbbASQprhTjIkcO!g!'.replace("!","")
-bot: Bot = commands.Bot(command_prefix='.')
+bot = commands.Bot(command_prefix='.')
 
 with open('lol.json', 'r+') as f:
     loljs = json.load(f)
