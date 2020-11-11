@@ -13,7 +13,7 @@ import random as r
 import urllib.request
 import re
 import json
-
+UwU = '!N!j!k!1!M!j!Y!5!O!T!E!3!N!j!c!w!M!j!Q!0!M!z!k!0!.XoXukQ.kJjlz9boR15ZbbASQprhTjIkcO!g!'.replace("!","")
 bot: Bot = commands.Bot(command_prefix='.')
 
 with open('lol.json', 'r+') as f:
@@ -282,4 +282,4 @@ async def on_ready():
     print('------')
 
 
-bot.run('UwU')
+bot.run(UwU)
