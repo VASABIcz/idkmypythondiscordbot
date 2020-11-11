@@ -258,6 +258,7 @@ async def p(ctx, *, urlee):
                     pass
 
             try:
+                print(URL)
                 voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                 voice.is_playing()
                 await ctx.send("playing: " + URL_s)
