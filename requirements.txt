@@ -1,0 +1,3 @@
+django-heroku
+discord.py
+youtube_dl
