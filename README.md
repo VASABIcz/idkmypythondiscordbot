@@ -1,0 +1,2 @@
+# idkmypythondiscordbot
+irdk
