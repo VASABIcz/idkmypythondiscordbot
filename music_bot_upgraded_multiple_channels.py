@@ -283,4 +283,4 @@ async def on_ready():
     print('------')
 
 
-bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.HABgKFE7_vgrXbXxh4GoZhdi7Uc')
+bot.run('UwU')
