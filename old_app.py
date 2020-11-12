@@ -13,16 +13,15 @@ import random as r
 import urllib.request
 import re
 import json
+import ctypes
+import ctypes.util
+ 
 
-#discord.opus.load_opus()
+UwU = '!N!j!k!1!M!j!Y!5!O!T!E!3!N!j!c!w!M!j!Q!0!M!z!k!0!.XoXukQ.kJjlz9boR15ZbbASQprhTjIkcO!g!'.replace("!","")
+bot = commands.Bot(command_prefix='.')
 
-bot: Bot = commands.Bot(command_prefix='..')
-with open('cache.json', 'r+') as f:
-    cache = json.load(f)
-
-loljs = {}
-
-
+with open('lol.json', 'r+') as f:
+    loljs = json.load(f)
 
 
 def is_connected(ctx):
@@ -58,7 +57,8 @@ async def loopqd(ctx):
 
     loljs[str(ctx.guild.id)]['loop'] = False
 
-
+    # voice = get(bot.voice_clients, guild=ctx.guild)
+    # voice.stop()
 
 
 @bot.command(pass_context=True, brief="stops all music")
@@ -94,64 +94,21 @@ async def d(ctx):
 
 
 @bot.command(brief="shows songs in que", help="just .que LOOOOL")
-async def que(ctx, nam):
-    nam = int(nam)
-    global loljs
+async def que(ctx):
     n = 0
-    if nam == None:
-        n = 0
-    if nam == 1:
-        n = 0
-    if nam == 2:
-        n = 5
-    if nam == 3:
-        n = 10
-    if nam == 4:
-        n = 15
-
-
+    global loljs
     #print(loljs)
-    #if not str(ctx.guild.id) in loljs:
-    #    loljs[str(ctx.guild.id)] = {}
-    #    loljs[str(ctx.guild.id)]['loop'] = False
-    #    loljs[str(ctx.guild.id)]['que'] = []
-    #for x in loljs[str(ctx.guild.id)]['que']:
-    #    n += 1
-    #    await ctx.channel.send("{}: {}".format(n, x))
-
-
-    qee = loljs[str(ctx.guild.id)]['que']
-
-    embed = discord.Embed(title="QUE (:", description="Song que", color=0x00ff00)
-    embed.set_author(name="VASABI", url="https://github.com/VASABIcz/idkmypythondiscordbot")
-
-    try:
-        embed.add_field(name=qee[0+n], value=1+n, inline=False)
-    except:
-        pass
-    try:
-        embed.add_field(name=qee[1+n], value=2+n, inline=False)
-    except:
-        pass
-    try:
-        embed.add_field(name=qee[2+n], value=3+n, inline=False)
-    except:
-        pass
-    try:
-        embed.add_field(name=qee[3+n], value=4+n, inline=False)
-    except:
-        pass
-    try:
-        embed.add_field(name=qee[4+n], value=5+n, inline=False)
-    except:
-        pass
-    embed.set_footer(text="page<{}>".format(nam))
-    await ctx.send(embed=embed)
+    if not str(ctx.guild.id) in loljs:
+        loljs[str(ctx.guild.id)] = {}
+        loljs[str(ctx.guild.id)]['loop'] = False
+        loljs[str(ctx.guild.id)]['que'] = []
+    for x in loljs[str(ctx.guild.id)]['que']:
+        n += 1
+        await ctx.channel.send("{}: {}".format(n, x))
 
 
 @bot.command(brief="remove 1 specific song from que ", help=".r number of song (use .que)")
-async def r(ctx, *, id):
-    id = int(id)
+async def r(ctx, id):
     global loljs
     if not str(ctx.guild.id) in loljs:
         loljs[str(ctx.guild.id)] = {}
@@ -216,37 +173,29 @@ async def load(ctx, ):
 
     with open('save.json', 'w') as f:
         json.dump(filee, f)
-    await ctx.invoke(bot.get_command('p'), urlee=None)
 
-# TODO Bug fix
-# TODO embed
-# TODO link  cache DONE
-# TODO make all extracrion on start ASI NE LIK SE SMAZE PO CASE
+
 @bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
 async def p(ctx, *, urlee):
     global loljs
-    global cache
+    #print(loljs)
     if not str(ctx.guild.id) in loljs:
         loljs[str(ctx.guild.id)] = {}
         loljs[str(ctx.guild.id)]['loop'] = False
         loljs[str(ctx.guild.id)]['que'] = []
     try:
-        urleee = cache[str(urlee)]['Url']
-
-    except:
-        vid = urlee
-        search_keyword = vid.replace(" ", "+")
+        search_keyword = urlee.replace(" ", "+")
         html = urllib.request.urlopen("https://www.youtube.com/results?search_query=" + search_keyword)
+        # print(html)
         video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
-        urleee = "https://www.youtube.com/watch?v=" + video_ids[0]
-        cache[str(urlee)] = {}
-        cache[str(urlee)]['Url'] = str(urleee)
-        with open('cache.json', 'w') as f:
-            json.dump(cache, f)
-    urleee = urlee
+        urlee = "https://www.youtube.com/watch?v=" + video_ids[0]
+    except:
+        pass
 
+    #print(loljs)
 
     urle = loljs[str(ctx.guild.id)]['que']
+    #print(loljs)
     ind = loljs[str(ctx.guild.id)]["crp"] = 0
 
     # ==========================================================================================================================
@@ -255,26 +204,27 @@ async def p(ctx, *, urlee):
     FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
     # ==========================================================================================================================
     # ==========================================================================================================================
+    #print(loljs)
     if not is_connected(ctx):
         channel = ctx.author.voice.channel
         await channel.connect()
 
-    urle.append(urleee)
+    urle.append(urlee)
+    #print(urle)
     voice = get(bot.voice_clients, guild=ctx.guild)
     while urle is not None:
         if not voice.is_playing():
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 # print(loljs[str(ctx.guild.id)]['loop'])
                 if loljs[str(ctx.guild.id)]['loop'] == True:
+                    #print("hi")
                     lenght = len(urle)
                     try:
                         try:
                             info = ydl.extract_info(urle[ind], download=False)
-                            print(info)
                         except:
                             await asyncio.sleep(1.5)
                             info = ydl.extract_info(urle[ind], download=False)
-                            print(info)
                     except:
                         pass
 
@@ -287,11 +237,9 @@ async def p(ctx, *, urlee):
                     try:
                         try:
                             info = ydl.extract_info(urle[0], download=False)
-                            print(info)
                         except:
-                            await asyncio.sleep(1.5)
+                            await asyncio.sleep(0.5)
                             info = ydl.extract_info(urle[0], download=False)
-                            print(info)
                     except:
                         pass
                     try:
@@ -302,47 +250,23 @@ async def p(ctx, *, urlee):
                         urle = []
                 try:
                     try:
-
+                        # (info)
                         URL = info['entries'][0]['formats'][0]['url']
                         URL_s = info['entries'][0]['webpage_url']
-                        tit = info['entries'][0]['title']
-                        thumb = info['entries'][0]['thumbnails'][0]['url']
-
-                        print(thumb)
 
                     except:
-
+                        # print(info)
                         URL = info['formats'][0]['url']
                         URL_s = info['webpage_url']
-                        tit = info[0]['title']
-                        thumb = info[0]['thumbnails'][0]['url']
-                        print(thumb)
                 except:
                     pass
 
-            try:
-                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                voice.is_playing()
-                #await ctx.send("playing: " + URL_s)
 
+            print(URL)
+            voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+            voice.is_playing()
+            await ctx.send("playing: " + URL_s)
 
-                #embedVar = discord.Embed(title="Now playing", description=URL_s, color=0x00ff00)
-                #embedVar.add_field(name="Field1", value="hi", inline=False)
-                #embedVar.add_field(name="Field2", value="hi2", inline=False)
-                #await ctx.send(embed=embedVar)
-
-                #22222222222222222222222222222222222222
-                embed = discord.Embed(title=tit,
-                                      url=URL_s, description="Now playing:",
-                                      color=0x00ff00)
-                embed.set_author(name="VASABI", url="https://github.com/VASABIcz/idkmypythondiscordbot")
-                embed.set_thumbnail(
-                    url=thumb)
-                await ctx.send(embed=embed)
-
-
-            except:
-                pass
             info = None
             URL = None
             URL_s = None
@@ -362,4 +286,4 @@ async def on_ready():
     print('------')
 
 
-bot.run('Nzc2MjAxMzc4MzAwNjkwNDUy.X6xb3Q.kgAJjt3Ps_PqiNbjFrox29zuMes!!!'.replace("!",""))
+bot.run(UwU)
