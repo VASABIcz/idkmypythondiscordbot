@@ -16,7 +16,7 @@ import json
 
 #discord.opus.load_opus()
 
-bot: Bot = commands.Bot(command_prefix='..')
+bot: Bot = commands.Bot(command_prefix='.')
 with open('cache.json', 'r+') as f:
     cache = json.load(f)
 
