@@ -45,7 +45,7 @@ async def loopq(ctx):
         loljs[str(ctx.guild.id)]['que'] = []
 
     loljs[str(ctx.guild.id)]['loop'] = True
-    #print(loljs[str(ctx.guild.id)]['loop'])
+    
 
 
 @bot.command(pass_context=True, brief="stops loop a song")
@@ -110,7 +110,7 @@ async def que(ctx, nam):
         n = 15
 
 
-    #print(loljs)
+    
     #if not str(ctx.guild.id) in loljs:
     #    loljs[str(ctx.guild.id)] = {}
     #    loljs[str(ctx.guild.id)]['loop'] = False
@@ -187,7 +187,7 @@ async def dump(ctx):
         filee[str(id)] = {}
         filee[str(id)]['que'] = []
     filee[str(id)]['que'] = loljs[str(ctx.guild.id)]['que']
-    #print(filee[str(id)]['que'])
+
 
     with open('save.json', 'w') as f:
         json.dump(filee, f)
@@ -212,7 +212,7 @@ async def load(ctx, ):
             filee = json.load(f)
 
     loljs[str(ctx.guild.id)]['que'] = filee[str(id)]['que']
-    #print(loljs[str(ctx.guild.id)]['que'])
+
 
     with open('save.json', 'w') as f:
         json.dump(filee, f)
@@ -264,17 +264,17 @@ async def p(ctx, *, urlee):
     while urle is not None:
         if not voice.is_playing():
             with YoutubeDL(YDL_OPTIONS) as ydl:
-                # print(loljs[str(ctx.guild.id)]['loop'])
+               
                 if loljs[str(ctx.guild.id)]['loop'] == True:
                     lenght = len(urle)
                     try:
                         try:
                             info = ydl.extract_info(urle[ind], download=False)
-                            print(info)
+                     
                         except:
                             await asyncio.sleep(1.5)
                             info = ydl.extract_info(urle[ind], download=False)
-                            print(info)
+                       
                     except:
                         pass
 
@@ -287,11 +287,11 @@ async def p(ctx, *, urlee):
                     try:
                         try:
                             info = ydl.extract_info(urle[0], download=False)
-                            print(info)
+                     
                         except:
                             await asyncio.sleep(1.5)
                             info = ydl.extract_info(urle[0], download=False)
-                            print(info)
+             
                     except:
                         pass
                     try:
@@ -308,7 +308,7 @@ async def p(ctx, *, urlee):
                         tit = info['entries'][0]['title']
                         thumb = info['entries'][0]['thumbnails'][0]['url']
 
-                        print(thumb)
+             
 
                     except:
 
@@ -316,7 +316,7 @@ async def p(ctx, *, urlee):
                         URL_s = info['webpage_url']
                         tit = info[0]['title']
                         thumb = info[0]['thumbnails'][0]['url']
-                        print(thumb)
+                  
                 except:
                     pass
 
