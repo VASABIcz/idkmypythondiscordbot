@@ -16,7 +16,7 @@ import json
 
 #discord.opus.load_opus()
 
-bot: Bot = commands.Bot(command_prefix='..')
+bot: Bot = commands.Bot(command_prefix='.')
 
 
 loljs = {}
@@ -356,4 +356,4 @@ async def on_ready():
     print('------')
 
 
-bot.run('Nzc2MjAxMzc4MzAwNjkwNDUy.X6xb3Q.kgAJjt3Ps_PqiNbjFrox29zuMes')
+bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.kJjlz9boR15ZbbASQprhTjIkcOg')
