@@ -14,7 +14,7 @@ import urllib.request
 import re
 import json
 
-#discord.opus.load_opus()
+discord.opus.load_opus()
 
 bot: Bot = commands.Bot(command_prefix='.')
 
