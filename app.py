@@ -362,4 +362,4 @@ async def on_ready():
     print('------')
 
 
-bot.run('Nzc2MjAxMzc4MzAwNjkwNDUy.X6xb3Q.kgAJjt3Ps_PqiNbjFrox29zuMes!!!'.replace("!",""))
+bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.kJjlz9boR15ZbbASQprhTjIkcOg!!!'.replace("!",""))
