@@ -264,7 +264,9 @@ async def p(ctx, *, urlee):
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 # print(loljs[str(ctx.guild.id)]['loop'])
                 if loljs[str(ctx.guild.id)]['loop'] == True:
+                    loljs[str(ctx.guild.id)]["crp"] 
                     lenght = len(loljs[str(ctx.guild.id)]['que'])
+                    print(lenght)
                     try:
                         try:
                             info = ydl.extract_info(loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]],
@@ -351,4 +353,4 @@ async def on_ready():
     print('------')
 
 
-bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.kJjlz9boR15ZbbASQprhTjIkcOg')
+bot.run('Nzc2MjAxMzc4MzAwNjkwNDUy.X6xb3Q.kgAJjt3Ps_PqiNbjFrox29zuMes')
