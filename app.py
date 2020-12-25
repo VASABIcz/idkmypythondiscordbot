@@ -8,7 +8,7 @@ import asyncio
 import random as re
 
 ###LOAD OPUS USED FOR RUNNING ON SERVER
-discord.opus.load_opus()
+#discord.opus.load_opus()
 bot = commands.Bot(command_prefix='.')
 
 loljs = {}
