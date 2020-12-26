@@ -274,7 +274,6 @@ async def p(ctx, *, urlee=None):
                     else:
                         if 'youtube.com/playlist?list=' in urlee:
                             for i in range(len(info['entries'])):
-                                print(i)
                                 loljs[str(ctx.guild.id)]['que'].append({})
                                 thumb = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['thumb'] = info['entries'][i]['thumbnail']
                                 loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL'] = info['entries'][i]['url']
@@ -326,7 +325,6 @@ async def p(ctx, *, urlee=None):
                     if not voice.is_playing():
                         if is_connected(ctx):
                             if loljs[str(ctx.guild.id)]['voice_id'] != voice.channel.id:
-                                print("yess")
                                 loljs[str(ctx.guild.id)]['que'].insert(0, {})
                                 loljs[str(ctx.guild.id)]['que'][0]['URL'] = loljs[str(ctx.guild.id)]["crpe"]['URL']
                                 loljs[str(ctx.guild.id)]['que'][0]['URL_s'] = loljs[str(ctx.guild.id)]["crpe"]['URL_s']
@@ -338,7 +336,6 @@ async def p(ctx, *, urlee=None):
                                 loop = loljs[str(ctx.guild.id)]['loop']
 
                                 ###EXTRACT FROM JSON
-                                print(loljs)
                                 thumb = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['thumb']
                                 URL = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['URL']
                                 URL_s = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['URL_s']
