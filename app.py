@@ -7,17 +7,12 @@ import json
 import asyncio
 import random as re
 
-###LOAD OPUS USED FOR RUNNING ON SERVER
-#discord.opus.load_opus()
 bot = commands.Bot(command_prefix='.')
 
 loljs = {}
 
-
-def rgb_to_hex(rgb):
-    return '%02x%02x%02x' % rgb
-
-
+#TODO moving bot remove que???
+#ON move error reroll crp song
 def init(ctx):
     global loljs
     if not str(ctx.guild.id) in loljs:
@@ -25,10 +20,12 @@ def init(ctx):
         loljs[str(ctx.guild.id)]['loop'] = False
         loljs[str(ctx.guild.id)]['que'] = []
         loljs[str(ctx.guild.id)]["crp"] = 0
+        loljs[str(ctx.guild.id)]['voice_id'] = None
         loljs[str(ctx.guild.id)]["crpe"] = {}
         loljs[str(ctx.guild.id)]["crpe"]['tit'] = None
         loljs[str(ctx.guild.id)]["crpe"]['URL_s'] = None
         loljs[str(ctx.guild.id)]["crpe"]['thumb'] = None
+        loljs[str(ctx.guild.id)]["crpe"]['URL'] = None
 
 
 def is_connected(ctx):
@@ -55,8 +52,6 @@ async def loopq(ctx):
     await ctx.send("que has been looped (:")
 
 
-
-
 @bot.command(brief="stops loop a song")
 async def loopqd(ctx):
     global loljs
@@ -69,8 +64,9 @@ async def loopqd(ctx):
 @bot.command(brief="stops all music")
 async def oof(ctx):
     global loljs
-    voice = get(bot.voice_clients, guild=ctx.guild)
     init(ctx)
+
+    voice = get(bot.voice_clients, guild=ctx.guild)
     loljs[str(ctx.guild.id)]['que'] = []
     loljs[str(ctx.guild.id)]['crp'] = 0
     if voice:
@@ -281,20 +277,20 @@ async def p(ctx, *, urlee=None):
                                 print(i)
                                 loljs[str(ctx.guild.id)]['que'].append({})
                                 thumb = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['thumb'] = info['entries'][i]['thumbnail']
-                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URl'] = info['entries'][i]['url']
+                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL'] = info['entries'][i]['url']
                                 URL_s = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL_s'] = info['entries'][i]['webpage_url']
                                 tit = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['tit'] = info['entries'][i]['title']
                         else:
                             if 'entries' not in info:
                                 loljs[str(ctx.guild.id)]['que'].append({})
                                 thumb = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['thumb'] = info['thumbnail']
-                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URl'] = info['url']
+                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL'] = info['url']
                                 URL_s = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL_s'] = info['webpage_url']
                                 loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['tit'] = info['title']
                             else:
                                 loljs[str(ctx.guild.id)]['que'].append({})
                                 thumb = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['thumb'] = info['entries'][0]['thumbnail']
-                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URl'] = info['entries'][0]['url']
+                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL'] = info['entries'][0]['url']
                                 URL_s = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL_s'] = info['entries'][0]['webpage_url']
                                 tit = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['tit'] = info['entries'][0]['title']
 
@@ -323,42 +319,58 @@ async def p(ctx, *, urlee=None):
 
                 except:
                     await ctx.send("BAD URL D:")
+                loljs[str(ctx.guild.id)]['voice_id'] = voice.channel.id
+
                     ###SOME LOOP AND INIT STUFF
                 while True:
                     if not voice.is_playing():
-                        if loljs[str(ctx.guild.id)]['que']:
-                            loop = loljs[str(ctx.guild.id)]['loop']
+                        if is_connected(ctx):
+                            if loljs[str(ctx.guild.id)]['voice_id'] != voice.channel.id:
+                                print("yess")
+                                loljs[str(ctx.guild.id)]['que'].insert(0, {})
+                                loljs[str(ctx.guild.id)]['que'][0]['URL'] = loljs[str(ctx.guild.id)]["crpe"]['URL']
+                                loljs[str(ctx.guild.id)]['que'][0]['URL_s'] = loljs[str(ctx.guild.id)]["crpe"]['URL_s']
+                                loljs[str(ctx.guild.id)]['que'][0]['thumb'] = loljs[str(ctx.guild.id)]["crpe"]['thumb']
+                                loljs[str(ctx.guild.id)]['que'][0]['tit'] = loljs[str(ctx.guild.id)]["crpe"]['tit']
+                            loljs[str(ctx.guild.id)]['voice_id'] = voice.channel.id
+                            if loljs[str(ctx.guild.id)]['que']:
+                                voice = get(bot.voice_clients, guild=ctx.guild)
+                                loop = loljs[str(ctx.guild.id)]['loop']
 
-                            ###EXTRACT FROM JSON
-                            thumb = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['thumb']
-                            URL = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['URl']
-                            URL_s = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['URL_s']
-                            tit = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['tit']
-                            loljs[str(ctx.guild.id)]["crpe"]['tit'] = tit
-                            loljs[str(ctx.guild.id)]["crpe"]['URL_s'] = URL_s
-                            loljs[str(ctx.guild.id)]["crpe"]['thumb'] = thumb
+                                ###EXTRACT FROM JSON
+                                print(loljs)
+                                thumb = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['thumb']
+                                URL = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['URL']
+                                URL_s = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['URL_s']
+                                tit = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['tit']
+                                loljs[str(ctx.guild.id)]["crpe"]['tit'] = tit
+                                loljs[str(ctx.guild.id)]["crpe"]['URL_s'] = URL_s
+                                loljs[str(ctx.guild.id)]["crpe"]['thumb'] = thumb
+                                loljs[str(ctx.guild.id)]["crpe"]['URL'] = URL
 
-                            ###HANDLE LOOP
-                            if loop:
-                                lenght = len(loljs[str(ctx.guild.id)]['que'])
-                                loljs[str(ctx.guild.id)]["crp"] += 1
-                                if loljs[str(ctx.guild.id)]["crp"] == lenght:
-                                    loljs[str(ctx.guild.id)]["crp"] = 0
+                                ###HANDLE LOOP
+                                if loop:
+                                    lenght = len(loljs[str(ctx.guild.id)]['que'])
+                                    loljs[str(ctx.guild.id)]["crp"] += 1
+                                    if loljs[str(ctx.guild.id)]["crp"] == lenght:
+                                        loljs[str(ctx.guild.id)]["crp"] = 0
+                                else:
+                                    del loljs[str(ctx.guild.id)]['que'][0]
+
+                                ###STREAM AUDIO
+                                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+                                voice.source = discord.PCMVolumeTransformer(voice.source)
+                                voice.source.volume = 0.01
+                                voice.is_playing()
+
+                                ###SOME BULLSHIT THAT MAKES IT WORK THIS MIGHT BE BETTER
+                                await asyncio.sleep(1)
                             else:
-                                del loljs[str(ctx.guild.id)]['que'][0]
-
-                            ###STREAM AUDIO
-                            voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                            voice.source = discord.PCMVolumeTransformer(voice.source)
-                            voice.source.volume = 0.01
-                            voice.is_playing()
-
-                            ###SOME BULLSHIT THAT MAKES IT WORK THIS MIGHT BE BETTER
-                            await asyncio.sleep(1)
+                                loljs[str(ctx.guild.id)]["crpe"]['tit'] = None
+                                loljs[str(ctx.guild.id)]["crpe"]['URL_s'] = None
+                                loljs[str(ctx.guild.id)]["crpe"]['thumb'] = None
+                                await asyncio.sleep(1)
                         else:
-                            loljs[str(ctx.guild.id)]["crpe"]['tit'] = None
-                            loljs[str(ctx.guild.id)]["crpe"]['URL_s'] = None
-                            loljs[str(ctx.guild.id)]["crpe"]['thumb'] = None
                             await asyncio.sleep(1)
                     else:
                         await asyncio.sleep(1)
