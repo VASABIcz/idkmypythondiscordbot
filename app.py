@@ -374,4 +374,4 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
 
-bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.kJjlz9boR15ZbbASQprhTjIkcOg')
+bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.LW6f-mojf64U_QzhCzXAZIkuIHQ')
