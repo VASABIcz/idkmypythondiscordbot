@@ -124,6 +124,7 @@ async def que(ctx, nam=0):
 @bot.command(brief="remove 1 specific song from que ", help=".r number of song (use .que)")
 async def r(ctx, *, id=None):
     if id:
+        id = int(id)
         if isinstance(id, int):
             if id <= 0:
                 global loljs
