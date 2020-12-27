@@ -126,7 +126,7 @@ async def r(ctx, *, id=None):
     if id:
         id = int(id)
         if isinstance(id, int):
-            if id <= 0:
+            if id >= 0:
                 global loljs
                 init(ctx)
                 if len(loljs[str(ctx.guild.id)]['que']) >= id - 1:
