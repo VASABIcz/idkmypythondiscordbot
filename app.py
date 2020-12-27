@@ -358,7 +358,7 @@ async def p(ctx, *, urlee=None):
                                 ###STREAM AUDIO
                                 voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                                 voice.source = discord.PCMVolumeTransformer(voice.source)
-                                voice.source.volume = 0.01
+                                voice.source.volume = 0.1
                                 voice.is_playing()
 
                                 ###SOME BULLSHIT THAT MAKES IT WORK THIS MIGHT BE BETTER
