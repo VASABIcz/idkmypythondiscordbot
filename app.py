@@ -318,7 +318,7 @@ async def p(ctx, *, urlee=None):
                         await ctx.send(embed=embed)
 
                 except:
-                    await ctx.send("BAD URL D:")
+                    pass
                 loljs[str(ctx.guild.id)]['voice_id'] = voice.channel.id
 
                     ###SOME LOOP AND INIT STUFF
@@ -358,7 +358,7 @@ async def p(ctx, *, urlee=None):
                                 ###STREAM AUDIO
                                 voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                                 voice.source = discord.PCMVolumeTransformer(voice.source)
-                                voice.source.volume = 0.1
+                                voice.source.volume = 0.01
                                 voice.is_playing()
 
                                 ###SOME BULLSHIT THAT MAKES IT WORK THIS MIGHT BE BETTER
