@@ -11,21 +11,46 @@ bot = commands.Bot(command_prefix='.')
 
 loljs = {}
 
-#TODO moving bot remove que???
-#ON move error reroll crp song
+
+# TODO new HELP command
+# embed=discord.Embed(title='HELP', description=for more information use help command name, colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
+# embed.set_author(name='VASABI',
+#                 url='https://github.com/VASABIcz/Simple-discord-music-bot',
+#                 icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
+# embed.add_field(name='play', value='play a song', inline=False)
+# embed.add_field(name='skip', value='skip currently playing song', inline=False)
+# embed.add_field(name='connect', value='connect to voice', inline=False)
+# embed.add_field(name='remove', value='remove song from queue', inline=False)
+# embed.add_field(name='queue', value='show current queue', inline=False)
+# embed.add_field(name='stop', value='vipes bot queu and dc', inline=False)
+# embed.add_field(name='crp', value='currently playing song', inline=False)
+# embed.add_field(name='load', value='load saved playlist', inline=False)
+# embed.add_field(name='dump', value='save a queu as playlist', inline=False)
+# embed.add_field(name='other', value='send a meme gif', inline=False)
+# embed.set_footer(text=Help command)
+# await ctx.send(embed=embed)
+# TODO while moving bot que is None VALVE PLS FIX
+# guse fixed duno
+#TODO interactive command que
+
 def init(ctx):
     global loljs
-    if not str(ctx.guild.id) in loljs:
-        loljs[str(ctx.guild.id)] = {}
-        loljs[str(ctx.guild.id)]['loop'] = False
-        loljs[str(ctx.guild.id)]['que'] = []
-        loljs[str(ctx.guild.id)]["crp"] = 0
-        loljs[str(ctx.guild.id)]['voice_id'] = None
-        loljs[str(ctx.guild.id)]["crpe"] = {}
-        loljs[str(ctx.guild.id)]["crpe"]['tit'] = None
-        loljs[str(ctx.guild.id)]["crpe"]['URL_s'] = None
-        loljs[str(ctx.guild.id)]["crpe"]['thumb'] = None
-        loljs[str(ctx.guild.id)]["crpe"]['URL'] = None
+    if ctx.guild.id not in loljs:
+        loljs[ctx.guild.id] = {}
+        loljs[ctx.guild.id]['loop'] = False
+        loljs[ctx.guild.id]['que'] = []
+        loljs[ctx.guild.id]["crp"] = 0
+        loljs[ctx.guild.id]['voice_id'] = None
+        loljs[ctx.guild.id]["crpe"] = {}
+        loljs[ctx.guild.id]["crpe"]['tit'] = None
+        loljs[ctx.guild.id]["crpe"]['URL_s'] = None
+        loljs[ctx.guild.id]["crpe"]['thumb'] = None
+        loljs[ctx.guild.id]["crpe"]['URL'] = None
+        loljs[ctx.guild.id]['mid'] = None
+        loljs[ctx.guild.id]['ply'] = True
+        loljs[ctx.guild.id]['rpm'] = {}
+        loljs[ctx.guild.id]['rpm']['mid'] = None
+        loljs[ctx.guild.id]['rpm']['chid'] = None
 
 
 def is_connected(ctx):
@@ -48,7 +73,7 @@ async def loopq(ctx):
     global loljs
     init(ctx)
 
-    loljs[str(ctx.guild.id)]['loop'] = True
+    loljs[ctx.guild.id]['loop'] = True
     await ctx.send("que has been looped (:")
 
 
@@ -57,7 +82,7 @@ async def loopqd(ctx):
     global loljs
     init(ctx)
 
-    loljs[str(ctx.guild.id)]['loop'] = False
+    loljs[ctx.guild.id]['loop'] = False
     await ctx.send("que has been un looped (:")
 
 
@@ -67,8 +92,8 @@ async def oof(ctx):
     init(ctx)
 
     voice = get(bot.voice_clients, guild=ctx.guild)
-    loljs[str(ctx.guild.id)]['que'] = []
-    loljs[str(ctx.guild.id)]['crp'] = 0
+    loljs[ctx.guild.id]['que'] = []
+    loljs[ctx.guild.id]['crp'] = 0
     if voice:
         if voice.is_playing():
             voice.stop()
@@ -105,11 +130,12 @@ async def que(ctx, nam=0):
     else:
         n = (nam * 5) - 5
 
-    qee = loljs[str(ctx.guild.id)]['que']
+    qee = loljs[ctx.guild.id]['que']
 
-    embed = discord.Embed(title="QUE (:", description="Song que", colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
+    embed = discord.Embed(title="QUE (:", description="Song que",
+                          colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
     embed.set_author(name='VASABI',
-                     url='https://github.com/VASABIcz/Simple-discord-music-bot',           
+                     url='https://github.com/VASABIcz/Simple-discord-music-bot',
                      icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
     for i in range(5):
         try:
@@ -129,10 +155,10 @@ async def r(ctx, *, id=None):
             if id >= 0:
                 global loljs
                 init(ctx)
-                if len(loljs[str(ctx.guild.id)]['que']) >= id - 1:
-                    del loljs[str(ctx.guild.id)]['que'][int(id - 1)]
+                if len(loljs[ctx.guild.id]['que']) >= id - 1:
+                    del loljs[ctx.guild.id]['que'][int(id - 1)]
                     await ctx.send(
-                        "{} has been removed from que".format(loljs[str(ctx.guild.id)]['que'][int(id - 1)]['tit']))
+                        "{} has been removed from que".format(loljs[ctx.guild.id]['que'][int(id - 1)]['tit']))
                 else:
                     await ctx.send('Bad ID')
             else:
@@ -141,7 +167,6 @@ async def r(ctx, *, id=None):
             await ctx.send('Bad ID')
     else:
         await ctx.send('U need to add number of song in que (:')
-
 
 
 @bot.command(brief="cringe", help="cringe")
@@ -171,7 +196,7 @@ async def dump(ctx):
     if not str(id) in filee:
         filee[str(id)] = {}
         filee[str(id)]['que'] = []
-    filee[str(id)]['que'] = loljs[str(ctx.guild.id)]['que']
+    filee[str(id)]['que'] = loljs[ctx.guild.id]['que']
 
     with open('save.json', 'w') as f:
         json.dump(filee, f)
@@ -192,14 +217,14 @@ async def load(ctx):
             f.write('{}')
             filee = json.load(f)
 
-    loljs[str(ctx.guild.id)]['que'] = filee[str(idd)]['que']
+    loljs[ctx.guild.id]['que'] = filee[str(idd)]['que']
 
     if not filee[str(idd)]['que']:
         await ctx.send("U didnt save any que D:")
     else:
-        qoe = loljs[str(ctx.guild.id)]['que'][0]['URL_s']
-        #del loljs[str(ctx.guild.id)]['que'][0]
-        await ctx.invoke(bot.get_command('p'), urlee=qoe)
+        qoe = loljs[ctx.guild.id]['que'][0]['URL_s']
+        # del loljs[ctx.guild.id]['que'][0]
+        await ctx.invoke(bot.get_command('p'), urlee='')
 
 
 @bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
@@ -211,16 +236,30 @@ async def play(ctx, *, urlee=None):
 async def crp(ctx):
     init(ctx)
     global loljs
-    if loljs[str(ctx.guild.id)]["crpe"]['tit'] != None:
-        tit = loljs[str(ctx.guild.id)]["crpe"]['tit']
-        URL_s = loljs[str(ctx.guild.id)]["crpe"]['URL_s']
-        thumb = loljs[str(ctx.guild.id)]["crpe"]['thumb']
-        embed = discord.Embed(title=tit, url=URL_s, description='Currently playing',
-                              colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
+    if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
+        if loljs[ctx.guild.id]['rpm']['chid'] is not None:
+            chal = bot.get_channel(loljs[ctx.guild.id]['rpm']['chid'])
+            message = await chal.fetch_message(loljs[ctx.guild.id]['rpm']['mid'])
+            await message.delete()
+        embed = discord.Embed(title=loljs[ctx.guild.id]["crpe"]['tit'], url=loljs[ctx.guild.id]["crpe"]['URL_s'],
+                              color=0xbb00ff)
         embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                          icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
-        embed.set_thumbnail(url=thumb)
-        await ctx.send(embed=embed)
+        embed.set_thumbnail(url=loljs[ctx.guild.id]["crpe"]['thumb'])
+        # embed.add_field(name='lenght', value='10:24', inline=True)
+        embed.add_field(name='status', value='playing', inline=False)
+        embed.add_field(name='commands', value='_', inline=False)
+        embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
+        embed.add_field(name='❗️', value='**`disconnect`**', inline=True)
+        embed.add_field(name='⏩', value='**`skip`**', inline=True)  # **`aaaaaaa`**
+        message = await ctx.send(embed=embed)
+        await message.add_reaction('⏸️')
+        await message.add_reaction('▶️')
+        await message.add_reaction('❗')
+        await message.add_reaction('⏩')
+        await asyncio.sleep(0.2)
+        loljs[ctx.guild.id]['rpm']['mid'] = message.id
+        loljs[ctx.guild.id]['rpm']['chid'] = ctx.channel.id
     else:
         await ctx.send("Nothing is playing")
 
@@ -243,7 +282,7 @@ async def p(ctx, *, urlee=None):
                        'restrictfilenames': True,
                        'noplaylist': True,
                        'nocheckcertificate': True,
-                       'ignoreerrors': False,
+                       'ignoreerrors': True,
                        'logtostderr': False,
                        'quiet': True,
                        'no_warnings': False,
@@ -255,14 +294,9 @@ async def p(ctx, *, urlee=None):
         # ==========================================================================================================================
         # ==========================================================================================================================
 
-        ###CONNECTS TO VOICE CHANNEL
         if ctx.author.voice is None:
             await ctx.send("Ur not connected to voice channel")
         else:
-            if not is_connected(ctx):
-                channel = ctx.author.voice.channel
-                await channel.connect()
-            voice = get(bot.voice_clients, guild=ctx.guild)
 
             ###INIT YTDL
             with YoutubeDL(YDL_OPTIONS) as ydl:
@@ -275,103 +309,200 @@ async def p(ctx, *, urlee=None):
                     else:
                         if 'youtube.com/playlist?list=' in urlee:
                             for i in range(len(info['entries'])):
-                                loljs[str(ctx.guild.id)]['que'].append({})
-                                thumb = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['thumb'] = info['entries'][i]['thumbnail']
-                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL'] = info['entries'][i]['url']
-                                URL_s = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL_s'] = info['entries'][i]['webpage_url']
-                                tit = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['tit'] = info['entries'][i]['title']
+                                loljs[ctx.guild.id]['que'].append({})
+                                thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = \
+                                info['entries'][i]['thumbnail']
+                                loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = \
+                                info['entries'][i]['url']
+                                URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = \
+                                info['entries'][i]['webpage_url']
+                                tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = \
+                                info['entries'][i]['title']
+                                print(i)
+                            await ctx.send('playlist is loaded')
                         else:
                             if 'entries' not in info:
-                                loljs[str(ctx.guild.id)]['que'].append({})
-                                thumb = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['thumb'] = info['thumbnail']
-                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL'] = info['url']
-                                URL_s = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL_s'] = info['webpage_url']
-                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['tit'] = info['title']
+                                loljs[ctx.guild.id]['que'].append({})
+                                thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = info[
+                                    'thumbnail']
+                                loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = info['url']
+                                URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = info[
+                                    'webpage_url']
+                                tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = info[
+                                    'title']
                             else:
-                                loljs[str(ctx.guild.id)]['que'].append({})
-                                thumb = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['thumb'] = info['entries'][0]['thumbnail']
-                                loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL'] = info['entries'][0]['url']
-                                URL_s = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['URL_s'] = info['entries'][0]['webpage_url']
-                                tit = loljs[str(ctx.guild.id)]['que'][len(loljs[str(ctx.guild.id)]['que']) - 1]['tit'] = info['entries'][0]['title']
+                                loljs[ctx.guild.id]['que'].append({})
+                                thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = \
+                                info['entries'][0]['thumbnail']
+                                loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = \
+                                info['entries'][0]['url']
+                                URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = \
+                                info['entries'][0]['webpage_url']
+                                tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = \
+                                info['entries'][0]['title']
+
+                        ###CONNECT
+                        if not is_connected(ctx):
+                            channel = ctx.author.voice.channel
+                            await channel.connect()
 
                         ###SEND EMBED
-                        embed = discord.Embed(title=tit,
-                                              url=URL_s,
-                                              description='Added to que:',
+                        embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',
                                               colour=discord.Colour.from_rgb(re.randrange(0, 255), 0,
                                                                              re.randrange(0, 255)))
-
-                        embed.set_author(name='VASABI',
-                                         url='https://github.com/VASABIcz/Simple-discord-music-bot',
+                        embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                                          icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
-
                         embed.set_thumbnail(url=thumb)
-
-                        if loljs[str(ctx.guild.id)]["crpe"]['tit']:
-                            embed.set_footer(text="Position in que: {}".format(len(loljs[str(ctx.guild.id)]['que'])))
+                        if loljs[ctx.guild.id]["crpe"]['tit']:
+                            embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
                         else:
-                            if loljs[str(ctx.guild.id)]['loop']:
+                            if loljs[ctx.guild.id]['loop']:
                                 embed.set_footer(
-                                    text="Position in que: {}".format(len(loljs[str(ctx.guild.id)]['que'])))
+                                    text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
                             else:
                                 embed.set_footer(text="Now playing")
                         await ctx.send(embed=embed)
 
+
+
                 except:
                     pass
-                loljs[str(ctx.guild.id)]['voice_id'] = voice.channel.id
 
                     ###SOME LOOP AND INIT STUFF
                 while True:
+                    voice = get(bot.voice_clients, guild=ctx.guild)
                     if not voice.is_playing():
                         if is_connected(ctx):
-                            if loljs[str(ctx.guild.id)]['voice_id'] != voice.channel.id:
-                                loljs[str(ctx.guild.id)]['que'].insert(0, {})
-                                loljs[str(ctx.guild.id)]['que'][0]['URL'] = loljs[str(ctx.guild.id)]["crpe"]['URL']
-                                loljs[str(ctx.guild.id)]['que'][0]['URL_s'] = loljs[str(ctx.guild.id)]["crpe"]['URL_s']
-                                loljs[str(ctx.guild.id)]['que'][0]['thumb'] = loljs[str(ctx.guild.id)]["crpe"]['thumb']
-                                loljs[str(ctx.guild.id)]['que'][0]['tit'] = loljs[str(ctx.guild.id)]["crpe"]['tit']
-                            loljs[str(ctx.guild.id)]['voice_id'] = voice.channel.id
-                            if loljs[str(ctx.guild.id)]['que']:
-                                voice = get(bot.voice_clients, guild=ctx.guild)
-                                loop = loljs[str(ctx.guild.id)]['loop']
+                            if loljs[ctx.guild.id]['voice_id'] != voice.channel.id:
+                                if loljs[ctx.guild.id]["crpe"]['URL_s'] is not None:
+                                    # print("huh")
+                                    loljs[ctx.guild.id]['que'].insert(0, {})
+                                    loljs[ctx.guild.id]['que'][0]['URL'] = loljs[ctx.guild.id]["crpe"]['URL']
+                                    loljs[ctx.guild.id]['que'][0]['URL_s'] = loljs[ctx.guild.id]["crpe"][
+                                        'URL_s']
+                                    loljs[ctx.guild.id]['que'][0]['thumb'] = loljs[ctx.guild.id]["crpe"][
+                                        'thumb']
+                                    loljs[ctx.guild.id]['que'][0]['tit'] = loljs[ctx.guild.id]["crpe"]['tit']
+                                    # print(loljs)
+                            loljs[ctx.guild.id]['voice_id'] = voice.channel.id
+                            if loljs[ctx.guild.id]['que'] != []:
+                                loop = loljs[ctx.guild.id]['loop']
+                                if loop:
+                                    if urlee == '':
+                                        urlee = None
+                                    else:
+                                        lenght = len(loljs[ctx.guild.id]['que'])
+                                        loljs[ctx.guild.id]["crp"] += 1
+                                        if loljs[ctx.guild.id]["crp"] == lenght:
+                                            loljs[ctx.guild.id]["crp"] = 0
 
                                 ###EXTRACT FROM JSON
-                                thumb = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['thumb']
-                                URL = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['URL']
-                                URL_s = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['URL_s']
-                                tit = loljs[str(ctx.guild.id)]['que'][loljs[str(ctx.guild.id)]["crp"]]['tit']
-                                loljs[str(ctx.guild.id)]["crpe"]['tit'] = tit
-                                loljs[str(ctx.guild.id)]["crpe"]['URL_s'] = URL_s
-                                loljs[str(ctx.guild.id)]["crpe"]['thumb'] = thumb
-                                loljs[str(ctx.guild.id)]["crpe"]['URL'] = URL
-
-                                ###HANDLE LOOP
-                                if loop:
-                                    lenght = len(loljs[str(ctx.guild.id)]['que'])
-                                    loljs[str(ctx.guild.id)]["crp"] += 1
-                                    if loljs[str(ctx.guild.id)]["crp"] == lenght:
-                                        loljs[str(ctx.guild.id)]["crp"] = 0
-                                else:
-                                    del loljs[str(ctx.guild.id)]['que'][0]
+                                URL = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL']
 
                                 ###STREAM AUDIO
-                                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+                                try:
+                                    try:
+                                        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+                                    except:
+                                        info = ydl.extract_info(URL_s, download=False)
+                                        URL = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL'] = info[
+                                            'url']
+                                        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+                                except:
+                                    await asyncio.sleep(0.1)
+                                    try:
+                                        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+                                    except:
+                                        info = ydl.extract_info(URL_s, download=False)
+                                        URL = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL'] = info[
+                                            'url']
+                                        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                                 voice.source = discord.PCMVolumeTransformer(voice.source)
                                 voice.source.volume = 0.01
                                 voice.is_playing()
 
+                                thumb = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['thumb']
+                                URL_s = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL_s']
+                                tit = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['tit']
+                                loljs[ctx.guild.id]["crpe"]['tit'] = tit
+                                loljs[ctx.guild.id]["crpe"]['URL_s'] = URL_s
+                                loljs[ctx.guild.id]["crpe"]['thumb'] = thumb
+                                loljs[ctx.guild.id]["crpe"]['URL'] = URL
+
+                                if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
+                                    try:
+                                        embed = discord.Embed(title=loljs[ctx.guild.id]["crpe"]['tit'],
+                                                              url=loljs[ctx.guild.id]["crpe"]['URL_s'], color=0xbb00ff)
+                                        embed.set_author(name='VASABI',
+                                                         url='https://github.com/VASABIcz/Simple-discord-music-bot',
+                                                         icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
+                                        embed.set_thumbnail(url=loljs[ctx.guild.id]["crpe"]['thumb'])
+                                        # embed.add_field(name='lenght', value='10:24', inline=True)
+                                        embed.add_field(name='status', value='playing', inline=False)
+                                        embed.add_field(name='commands', value='_', inline=False)
+                                        embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
+                                        embed.add_field(name='❗️', value='**`disconnect`**', inline=True)
+                                        embed.add_field(name='⏩', value='**`skip`**', inline=True)  # **`aaaaaaa`**
+                                        chal = bot.get_channel(int(loljs[ctx.guild.id]['rpm']['chid']))
+                                        message = await chal.fetch_message(loljs[ctx.guild.id]['rpm']['mid'])
+                                        await message.edit(embed=embed)
+                                    except:
+                                        pass
+                                else:
+                                    pass
+
+                                loop = loljs[ctx.guild.id]['loop']
+
+                                ###HANDLE LOOP
+
+                                if not loop:
+                                    del loljs[ctx.guild.id]['que'][0]
+
                                 ###SOME BULLSHIT THAT MAKES IT WORK THIS MIGHT BE BETTER
-                                await asyncio.sleep(1)
                             else:
-                                loljs[str(ctx.guild.id)]["crpe"]['tit'] = None
-                                loljs[str(ctx.guild.id)]["crpe"]['URL_s'] = None
-                                loljs[str(ctx.guild.id)]["crpe"]['thumb'] = None
-                                await asyncio.sleep(1)
+                                loljs[ctx.guild.id]["crpe"]['tit'] = None
+                                loljs[ctx.guild.id]["crpe"]['URL_s'] = None
+                                loljs[ctx.guild.id]["crpe"]['thumb'] = None
+                                await asyncio.sleep(0.1)
                         else:
-                            await asyncio.sleep(1)
+                            await asyncio.sleep(0.1)
                     else:
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(0.1)
+
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    global loljs
+    ###handle reaction
+    gid = payload.guild_id
+    if loljs[gid]['rpm']['mid'] is not None:
+        if payload.message_id == loljs[gid]['rpm']['mid']:
+            channel = bot.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            user = bot.get_user(payload.user_id)
+            if payload.emoji.id is not None:
+                emoji = bot.get_emoji(payload.emoji.id)
+            else:
+                emoji = payload.emoji.name
+            await message.remove_reaction(emoji, user)
+            ###handele commnad
+            if payload.emoji.name == '⏸️':
+                pass
+            if payload.emoji.name == '▶️':
+                pass
+            if payload.emoji.name == '❗':
+                guild = bot.get_guild(gid)
+                voice = get(bot.voice_clients, guild=guild)
+                loljs[gid]['que'] = []
+                loljs[gid]['crp'] = 0
+                if voice:
+                    if voice.is_playing():
+                        voice.stop()
+            if payload.emoji.name == '⏩':
+                guild = bot.get_guild(gid)
+                voice = get(bot.voice_clients, guild=guild)
+                if voice is not None:
+                    voice.stop()
 
 
 @bot.event
