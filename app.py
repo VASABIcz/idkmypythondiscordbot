@@ -6,6 +6,7 @@ from youtube_dl import YoutubeDL
 import json
 import asyncio
 import random as re
+import time
 
 bot = commands.Bot(command_prefix='.')
 
@@ -13,25 +14,10 @@ loljs = {}
 
 
 # TODO new HELP command
-# embed=discord.Embed(title='HELP', description=for more information use help command name, colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
-# embed.set_author(name='VASABI',
-#                 url='https://github.com/VASABIcz/Simple-discord-music-bot',
-#                 icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
-# embed.add_field(name='play', value='play a song', inline=False)
-# embed.add_field(name='skip', value='skip currently playing song', inline=False)
-# embed.add_field(name='connect', value='connect to voice', inline=False)
-# embed.add_field(name='remove', value='remove song from queue', inline=False)
-# embed.add_field(name='queue', value='show current queue', inline=False)
-# embed.add_field(name='stop', value='vipes bot queu and dc', inline=False)
-# embed.add_field(name='crp', value='currently playing song', inline=False)
-# embed.add_field(name='load', value='load saved playlist', inline=False)
-# embed.add_field(name='dump', value='save a queu as playlist', inline=False)
-# embed.add_field(name='other', value='send a meme gif', inline=False)
-# embed.set_footer(text=Help command)
-# await ctx.send(embed=embed)
 # TODO while moving bot que is None VALVE PLS FIX
 # guse fixed duno
 #TODO interactive command que
+#FIXED
 
 def init(ctx):
     global loljs
@@ -51,11 +37,28 @@ def init(ctx):
         loljs[ctx.guild.id]['rpm'] = {}
         loljs[ctx.guild.id]['rpm']['mid'] = None
         loljs[ctx.guild.id]['rpm']['chid'] = None
+        loljs[ctx.guild.id]['quem'] = {}
+        loljs[ctx.guild.id]['quem']['mid'] = None
+        loljs[ctx.guild.id]['quem']['chid'] = None
+        loljs[ctx.guild.id]['quem']['pg'] = None
 
 
 def is_connected(ctx):
     voice_client = get(ctx.bot.voice_clients, guild=ctx.guild)
     return voice_client and voice_client.is_connected()
+
+
+def scrap(URL):
+    x = URL.find('expire=')
+    x += 7
+    y = URL.find('&ei')
+    ur = int(URL[x:y])
+    ur += -600
+    tim = time.time()
+    if ur <= tim:
+        return True
+    else:
+        return False
 
 
 @bot.command(brief="skips a song")
@@ -119,32 +122,37 @@ async def d(ctx):
 
 
 @bot.command(brief="shows songs in que", help="just .que LOOOOL")
-async def que(ctx, nam=0):
+async def que(ctx, nam=1):
     global loljs
     init(ctx)
-    nam = int(nam)
-    n = 0
-
-    if nam == 0:
+    try:
+        if loljs[ctx.guild.id]['quem']['chid'] is not None:
+            chal = bot.get_channel(loljs[ctx.guild.id]['quem']['chid'])
+            message = await chal.fetch_message(loljs[ctx.guild.id]['quem']['mid'])
+            await message.delete()
+    except:
         pass
-    else:
-        n = (nam * 5) - 5
+    if nam < 1:
+        nam = 1
 
     qee = loljs[ctx.guild.id]['que']
-
-    embed = discord.Embed(title="QUE (:", description="Song que",
-                          colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
-    embed.set_author(name='VASABI',
-                     url='https://github.com/VASABIcz/Simple-discord-music-bot',
-                     icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
+    embed = discord.Embed(title="QUE (:", description="Song que",colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
+    embed.set_author(name='VASABI',url='https://github.com/VASABIcz/Simple-discord-music-bot',icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
     for i in range(5):
         try:
-            embed.add_field(name=qee[int(i + n)]['tit'], value=str(i + 1 + n), inline=False)
+            embed.add_field(name=qee[int(i + (nam * 5) - 5)]['tit'], value=str(i + 1 + (nam * 5) - 5), inline=False)
         except:
             pass
 
     embed.set_footer(text="page<{}>".format(nam))
-    await ctx.send(embed=embed)
+    message = await ctx.send(embed=embed)
+    await message.add_reaction('◀️')
+    await message.add_reaction('▶️')
+    await message.add_reaction('🔄')
+    await asyncio.sleep(1)
+    loljs[ctx.guild.id]['quem']['mid'] = message.id
+    loljs[ctx.guild.id]['quem']['chid'] = ctx.channel.id
+    loljs[ctx.guild.id]['quem']['pg'] = nam
 
 
 @bot.command(brief="remove 1 specific song from que ", help=".r number of song (use .que)")
@@ -167,6 +175,11 @@ async def r(ctx, *, id=None):
             await ctx.send('Bad ID')
     else:
         await ctx.send('U need to add number of song in que (:')
+
+
+@bot.command(brief="shows songs in que", help="just .que LOOOOL")
+async def q(ctx, nam=1):
+    await ctx.invoke(bot.get_command('que'), nam=nam)
 
 
 @bot.command(brief="cringe", help="cringe")
@@ -222,7 +235,23 @@ async def load(ctx):
     if not filee[str(idd)]['que']:
         await ctx.send("U didnt save any que D:")
     else:
-        qoe = loljs[ctx.guild.id]['que'][0]['URL_s']
+        if loljs[ctx.guild.id]['que']:
+            ###VALIDATE FIRST LINK/
+                if scrap(loljs[ctx.guild.id]['que'][0]['URL']):
+                    print('hmmeee')
+                    YDL_OPTIONS = {'format': 'bestaudio/best',
+                                   'restrictfilenames': True,
+                                   'noplaylist': True,
+                                   'nocheckcertificate': True,
+                                   'ignoreerrors': True,
+                                   'logtostderr': False,
+                                   'quiet': True,
+                                   'no_warnings': False,
+                                   'default_search': 'auto',
+                                   'source_address': '0.0.0.0'}
+                    ydl = YoutubeDL(YDL_OPTIONS)
+                    info = ydl.extract_info(loljs[ctx.guild.id]['que'][0]['URL_s'], download=False)
+                    loljs[ctx.guild.id]['que'][0]['URL'] = info['url']
         # del loljs[ctx.guild.id]['que'][0]
         await ctx.invoke(bot.get_command('p'), urlee='')
 
@@ -237,27 +266,30 @@ async def crp(ctx):
     init(ctx)
     global loljs
     if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
-        if loljs[ctx.guild.id]['rpm']['chid'] is not None:
-            chal = bot.get_channel(loljs[ctx.guild.id]['rpm']['chid'])
-            message = await chal.fetch_message(loljs[ctx.guild.id]['rpm']['mid'])
-            await message.delete()
+        try:
+            if loljs[ctx.guild.id]['rpm']['chid'] is not None:
+                chal = bot.get_channel(loljs[ctx.guild.id]['rpm']['chid'])
+                message = await chal.fetch_message(loljs[ctx.guild.id]['rpm']['mid'])
+                await message.delete()
+        except:
+            pass
         embed = discord.Embed(title=loljs[ctx.guild.id]["crpe"]['tit'], url=loljs[ctx.guild.id]["crpe"]['URL_s'],
-                              color=0xbb00ff)
+                              colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
         embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                          icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
         embed.set_thumbnail(url=loljs[ctx.guild.id]["crpe"]['thumb'])
         # embed.add_field(name='lenght', value='10:24', inline=True)
         embed.add_field(name='status', value='playing', inline=False)
         embed.add_field(name='commands', value='_', inline=False)
-        embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
+        #embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
         embed.add_field(name='❗️', value='**`disconnect`**', inline=True)
         embed.add_field(name='⏩', value='**`skip`**', inline=True)  # **`aaaaaaa`**
         message = await ctx.send(embed=embed)
-        await message.add_reaction('⏸️')
-        await message.add_reaction('▶️')
+        #await message.add_reaction('⏸️')
+        #await message.add_reaction('▶️')
         await message.add_reaction('❗')
         await message.add_reaction('⏩')
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(1)
         loljs[ctx.guild.id]['rpm']['mid'] = message.id
         loljs[ctx.guild.id]['rpm']['chid'] = ctx.channel.id
     else:
@@ -302,71 +334,78 @@ async def p(ctx, *, urlee=None):
             with YoutubeDL(YDL_OPTIONS) as ydl:
 
                 ###HANDLE PLAYLIST/VIDEOS
-                try:
-                    info = ydl.extract_info(urlee, download=False)
-                    if 'entries' in info and info['entries'] == []:
-                        await ctx.send("BAD")
-                    else:
-                        if 'youtube.com/playlist?list=' in urlee:
-                            for i in range(len(info['entries'])):
-                                loljs[ctx.guild.id]['que'].append({})
-                                thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = \
-                                info['entries'][i]['thumbnail']
-                                loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = \
-                                info['entries'][i]['url']
-                                URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = \
-                                info['entries'][i]['webpage_url']
-                                tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = \
-                                info['entries'][i]['title']
-                                print(i)
-                            await ctx.send('playlist is loaded')
+                if urlee != "":
+                    try:
+                        info = ydl.extract_info(urlee, download=False)
+                        if 'entries' in info and info['entries'] == []:
+                            await ctx.send("BAD")
                         else:
-                            if 'entries' not in info:
-                                loljs[ctx.guild.id]['que'].append({})
-                                thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = info[
-                                    'thumbnail']
-                                loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = info['url']
-                                URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = info[
-                                    'webpage_url']
-                                tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = info[
-                                    'title']
+                            if 'youtube.com/playlist?list=' in urlee:
+                                for i in range(len(info['entries'])):
+                                    loljs[ctx.guild.id]['que'].append({})
+                                    thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = \
+                                        info['entries'][i]['thumbnail']
+                                    loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = \
+                                        info['entries'][i]['url']
+                                    URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = \
+                                        info['entries'][i]['webpage_url']
+                                    tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = \
+                                        info['entries'][i]['title']
+                                    print(i)
+                                await ctx.send('playlist is loaded')
                             else:
-                                loljs[ctx.guild.id]['que'].append({})
-                                thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = \
-                                info['entries'][0]['thumbnail']
-                                loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = \
-                                info['entries'][0]['url']
-                                URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = \
-                                info['entries'][0]['webpage_url']
-                                tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = \
-                                info['entries'][0]['title']
+                                if 'entries' not in info:
+                                    loljs[ctx.guild.id]['que'].append({})
+                                    thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = \
+                                    info[
+                                        'thumbnail']
+                                    loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = info['url']
+                                    URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = \
+                                    info[
+                                        'webpage_url']
+                                    tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = info[
+                                        'title']
+                                else:
+                                    loljs[ctx.guild.id]['que'].append({})
+                                    thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = \
+                                        info['entries'][0]['thumbnail']
+                                    loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = \
+                                        info['entries'][0]['url']
+                                    URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = \
+                                        info['entries'][0]['webpage_url']
+                                    tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = \
+                                        info['entries'][0]['title']
 
-                        ###CONNECT
-                        if not is_connected(ctx):
-                            channel = ctx.author.voice.channel
-                            await channel.connect()
+                            ###CONNECT
+                            if not is_connected(ctx):
+                                channel = ctx.author.voice.channel
+                                await channel.connect()
 
-                        ###SEND EMBED
-                        embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',
-                                              colour=discord.Colour.from_rgb(re.randrange(0, 255), 0,
-                                                                             re.randrange(0, 255)))
-                        embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
-                                         icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
-                        embed.set_thumbnail(url=thumb)
-                        if loljs[ctx.guild.id]["crpe"]['tit']:
-                            embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
-                        else:
-                            if loljs[ctx.guild.id]['loop']:
-                                embed.set_footer(
-                                    text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
+                            ###SEND EMBED
+                            embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',
+                                                  colour=discord.Colour.from_rgb(re.randrange(0, 255), 0,
+                                                                                 re.randrange(0, 255)))
+                            embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
+                                             icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
+                            embed.set_thumbnail(url=thumb)
+                            if loljs[ctx.guild.id]["crpe"]['tit']:
+                                embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
                             else:
-                                embed.set_footer(text="Now playing")
-                        await ctx.send(embed=embed)
+                                if loljs[ctx.guild.id]['loop']:
+                                    embed.set_footer(
+                                        text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
+                                else:
+                                    embed.set_footer(text="Now playing")
+                            await ctx.send(embed=embed)
 
 
 
-                except:
-                    pass
+                    except:
+                        pass
+                else:
+                    if not is_connected(ctx):
+                        channel = ctx.author.voice.channel
+                        await channel.connect()
 
                     ###SOME LOOP AND INIT STUFF
                 while True:
@@ -374,8 +413,9 @@ async def p(ctx, *, urlee=None):
                     if not voice.is_playing():
                         if is_connected(ctx):
                             if loljs[ctx.guild.id]['voice_id'] != voice.channel.id:
+
+                                ###RESTORE PLAYED SONG WHILE MOVING BOT
                                 if loljs[ctx.guild.id]["crpe"]['URL_s'] is not None:
-                                    # print("huh")
                                     loljs[ctx.guild.id]['que'].insert(0, {})
                                     loljs[ctx.guild.id]['que'][0]['URL'] = loljs[ctx.guild.id]["crpe"]['URL']
                                     loljs[ctx.guild.id]['que'][0]['URL_s'] = loljs[ctx.guild.id]["crpe"][
@@ -383,9 +423,10 @@ async def p(ctx, *, urlee=None):
                                     loljs[ctx.guild.id]['que'][0]['thumb'] = loljs[ctx.guild.id]["crpe"][
                                         'thumb']
                                     loljs[ctx.guild.id]['que'][0]['tit'] = loljs[ctx.guild.id]["crpe"]['tit']
-                                    # print(loljs)
                             loljs[ctx.guild.id]['voice_id'] = voice.channel.id
                             if loljs[ctx.guild.id]['que'] != []:
+
+                                ###LOOP
                                 loop = loljs[ctx.guild.id]['loop']
                                 if loop:
                                     if urlee == '':
@@ -401,26 +442,15 @@ async def p(ctx, *, urlee=None):
 
                                 ###STREAM AUDIO
                                 try:
-                                    try:
-                                        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                                    except:
-                                        info = ydl.extract_info(URL_s, download=False)
-                                        URL = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL'] = info[
-                                            'url']
-                                        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+                                    voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                                 except:
                                     await asyncio.sleep(0.1)
-                                    try:
-                                        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                                    except:
-                                        info = ydl.extract_info(URL_s, download=False)
-                                        URL = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL'] = info[
-                                            'url']
-                                        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+                                    voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                                 voice.source = discord.PCMVolumeTransformer(voice.source)
                                 voice.source.volume = 0.01
                                 voice.is_playing()
 
+                                ###SET CRP SONG
                                 thumb = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['thumb']
                                 URL_s = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL_s']
                                 tit = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['tit']
@@ -429,10 +459,11 @@ async def p(ctx, *, urlee=None):
                                 loljs[ctx.guild.id]["crpe"]['thumb'] = thumb
                                 loljs[ctx.guild.id]["crpe"]['URL'] = URL
 
+                                ###UPDATE CRP COMMAND
                                 if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
                                     try:
                                         embed = discord.Embed(title=loljs[ctx.guild.id]["crpe"]['tit'],
-                                                              url=loljs[ctx.guild.id]["crpe"]['URL_s'], color=0xbb00ff)
+                                                              url=loljs[ctx.guild.id]["crpe"]['URL_s'], colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
                                         embed.set_author(name='VASABI',
                                                          url='https://github.com/VASABIcz/Simple-discord-music-bot',
                                                          icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
@@ -440,7 +471,7 @@ async def p(ctx, *, urlee=None):
                                         # embed.add_field(name='lenght', value='10:24', inline=True)
                                         embed.add_field(name='status', value='playing', inline=False)
                                         embed.add_field(name='commands', value='_', inline=False)
-                                        embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
+                                        #embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
                                         embed.add_field(name='❗️', value='**`disconnect`**', inline=True)
                                         embed.add_field(name='⏩', value='**`skip`**', inline=True)  # **`aaaaaaa`**
                                         chal = bot.get_channel(int(loljs[ctx.guild.id]['rpm']['chid']))
@@ -450,11 +481,8 @@ async def p(ctx, *, urlee=None):
                                         pass
                                 else:
                                     pass
-
-                                loop = loljs[ctx.guild.id]['loop']
-
                                 ###HANDLE LOOP
-
+                                loop = loljs[ctx.guild.id]['loop']
                                 if not loop:
                                     del loljs[ctx.guild.id]['que'][0]
 
@@ -469,23 +497,32 @@ async def p(ctx, *, urlee=None):
                     else:
                         await asyncio.sleep(0.1)
 
+                        ###VALIDATE ALL LINKS WHILE PLAYING ANOTHER SONG TO BYPASS USER WAITING FOR VALIDATION
+                        if loljs[ctx.guild.id]['que']:
+                            for n in range(len(loljs[ctx.guild.id]['que'])):
+                                if scrap(loljs[ctx.guild.id]['que'][n]['URL']):
+                                    print('hmm')
+                                    info = ydl.extract_info(loljs[ctx.guild.id]['que'][n]['URL_s'], download=False)
+                                    loljs[ctx.guild.id]['que'][n]['URL'] = info['url']
 
+###INTERACRIVE CONTROL HANDELING
 @bot.event
 async def on_raw_reaction_add(payload):
     global loljs
+
     ###handle reaction
     gid = payload.guild_id
+    channel = bot.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
+    user = bot.get_user(payload.user_id)
+    ###HANDLED CRP COMMAND
     if loljs[gid]['rpm']['mid'] is not None:
         if payload.message_id == loljs[gid]['rpm']['mid']:
-            channel = bot.get_channel(payload.channel_id)
-            message = await channel.fetch_message(payload.message_id)
-            user = bot.get_user(payload.user_id)
             if payload.emoji.id is not None:
                 emoji = bot.get_emoji(payload.emoji.id)
             else:
                 emoji = payload.emoji.name
             await message.remove_reaction(emoji, user)
-            ###handele commnad
             if payload.emoji.name == '⏸️':
                 pass
             if payload.emoji.name == '▶️':
@@ -503,6 +540,46 @@ async def on_raw_reaction_add(payload):
                 voice = get(bot.voice_clients, guild=guild)
                 if voice is not None:
                     voice.stop()
+
+    ###HANDLE QUE COMMAND
+    if loljs[gid]['quem']['mid'] is not None:
+        if payload.message_id == loljs[gid]['quem']['mid']:
+            if payload.emoji.id is not None:
+                emoji = bot.get_emoji(payload.emoji.id)
+            else:
+                emoji = payload.emoji.name
+            await message.remove_reaction(emoji, user)
+            if payload.emoji.name == '▶️':
+                loljs[gid]['quem']['pg'] += 1
+            if payload.emoji.name == '◀️':
+                if loljs[gid]['quem']['pg'] > 1:
+                    loljs[gid]['quem']['pg'] += -1
+            if payload.emoji.name == '🔄':
+                pass
+
+
+            nam = loljs[gid]['quem']['pg']
+            qee = loljs[gid]['que']
+            embed = discord.Embed(title="QUE (:", description="Song que",
+                                  colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
+            embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
+                             icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
+            for i in range(5):
+                try:
+                    embed.add_field(name=qee[int(i + (nam * 5) - 5)]['tit'], value=str(i + 1 + (nam * 5) - 5),
+                                    inline=False)
+                except:
+                    pass
+
+            embed.set_footer(text="page<{}>".format(nam))
+            chal = bot.get_channel(int(loljs[gid]['quem']['chid']))
+            message = await chal.fetch_message(loljs[gid]['quem']['mid'])
+            await message.edit(embed=embed)
+
+
+
+
+
 
 
 @bot.event
