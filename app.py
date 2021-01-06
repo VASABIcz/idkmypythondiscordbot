@@ -11,21 +11,29 @@ import time
 bot = commands.Bot(command_prefix='.')
 
 loljs = {}
-x = 0
-
+###VECI KTERE JESTE BUDU DELAT NEBO JSEM DODELAL
 # TODO new HELP command
 # TODO while moving bot que is None VALVE PLS FIX
-# guse fixed duno
+# DONE
 # TODO interactive command que
-# FIXED
+# DONE
 # TODO fix connect command
-#DONE idk
-# TODO on_voice_state_update poggers
+# DONE
+# TODO on_voice_state_update
 # testing in progres
 # TODO BETER LINK VALIDATING/ CACHING
-#DONE idk
-#TODO volume controll command
+# DONE
+# TODO volume controll command
+#
+# TODO LEPSI LOOP SPRAVOVANI
+#
+# TODO OBECNE ZRYCHLENI BOTA
+#
+# TODO ODSTRANENI ERRORU PRI POSOUVANI BOTA MEZI CHANNELY(ciste esteticke)
+#
+# TODO FIXOVANI MENSICH BUGU
 
+###PRIDANI SERVRU DO DICTIONARY
 def init(ctx):
     global loljs
     try:
@@ -71,15 +79,15 @@ def is_connected(ctx):
     voice_client = get(ctx.bot.voice_clients, guild=ctx.guild)
     return voice_client and voice_client.is_connected()
 
-
+#EXTRAHOVANI FUCKNCNI DOBU SONGU
 def scrap(URL):
     try:
         x = URL.find('expire=')
         x += 7
         y = URL.find('&ei')
         ur = int(URL[x:y])
-        ur += -600
-        tim = time.time()
+        ur += -6000
+        tim = int(time.time())
         if ur <= tim:
             return True
         else:
@@ -89,14 +97,15 @@ def scrap(URL):
         x += 7
         y = URL.find('/ei/')
         ur = int(URL[x:y])
-        ur += -600
-        tim = time.time()
+        ur += -6000
+        tim = int(time.time())
         if ur <= tim:
             return True
         else:
             return False
 
 
+###COMAND PRO KONTROLU FUNKCNOSTI LINKU
 def validate(ctx, YDL_OPTIONS):
     ydl = YoutubeDL(YDL_OPTIONS)
     ###VALIDATE ALL LINKS WHILE PLAYING ANOTHER SONG TO BYPASS USER WAITING FOR VALIDATION
@@ -137,7 +146,7 @@ def validate(ctx, YDL_OPTIONS):
                         json.dump(filee, fe)
                     print('validated cache {}'.format(lil[n]))
 
-
+#PRESKOCENI PRAVE HRAJICIHO SONGU
 @bot.command(brief="skips a song")
 async def skip(ctx):
     voice = get(bot.voice_clients, guild=ctx.guild)
@@ -147,7 +156,7 @@ async def skip(ctx):
     else:
         await ctx.send("nothing to skip (((((((((:")
 
-
+###ZASMICKOVANI RADY SONGU
 @bot.command(brief="loop a song")
 async def loopq(ctx):
     global loljs
@@ -156,7 +165,7 @@ async def loopq(ctx):
     loljs[ctx.guild.id]['loop'] = True
     await ctx.send("que has been looped (:")
 
-
+###ODSMICKOVANI RADY SONGU
 @bot.command(brief="stops loop a song")
 async def loopqd(ctx):
     global loljs
@@ -165,7 +174,7 @@ async def loopqd(ctx):
     loljs[ctx.guild.id]['loop'] = False
     await ctx.send("que has been un looped (:")
 
-
+###COMMAND PRO VICISTENI SONGU
 @bot.command(brief="stops all music")
 async def oof(ctx):
     global loljs
@@ -179,12 +188,12 @@ async def oof(ctx):
             voice.stop()
             await ctx.send("U have succesfully oofed the bot")
 
-
+#KOMAND NA PINGNUTI BOTA
 @bot.command(brief="test command/ping command")
 async def hello(ctx):
     await ctx.channel.send("hello")
 
-
+#PRIPOJI NEBO PREPOJI BOTA
 @bot.command(brief="...")
 async def connect(ctx):
     channel = ctx.author.voice.channel
@@ -195,7 +204,7 @@ async def connect(ctx):
     else:
         await channel.connect()
 
-
+#ODPOJI BOTA
 @bot.command(brief="disconects bot from voice channel")
 async def d(ctx):
     server = ctx.message.guild.voice_client
@@ -204,7 +213,7 @@ async def d(ctx):
     await server.disconnect()
     await ctx.send("U DcD me D:")
 
-
+###VIPISE SONGY V RADE
 @bot.command(brief="shows songs in que", help="just .que LOOOOL")
 async def que(ctx, nam=1):
     global loljs
@@ -235,32 +244,21 @@ async def que(ctx, nam=1):
     await message.add_reaction('◀️')
     await message.add_reaction('▶️')
     await message.add_reaction('🔄')
-    await asyncio.sleep(1.5)
+    await asyncio.sleep(2)
     loljs[ctx.guild.id]['quem']['mid'] = message.id
     loljs[ctx.guild.id]['quem']['chid'] = ctx.channel.id
     loljs[ctx.guild.id]['quem']['pg'] = nam
 
-
+###COMMAND PRO ODSTRANENI SONGU Z RADY
 @bot.command(brief="remove 1 specific song from que ", help=".r number of song (use .que)")
-async def r(ctx, *, ide=None):
-    if ide:
-        ide = int(ide)
-        if isinstance(id, int):
-            if ide >= 0:
-                global loljs
-                init(ctx)
-                if len(loljs[ctx.guild.id]['que']) >= ide - 1:
-                    del loljs[ctx.guild.id]['que'][int(ide - 1)]
-                    await ctx.send(
-                        "{} has been removed from que".format(loljs[ctx.guild.id]['que'][int(ide - 1)]['tit']))
-                else:
-                    await ctx.send('Bad ID')
-            else:
-                await ctx.send('Bad ID')
-        else:
-            await ctx.send('Bad ID')
-    else:
-        await ctx.send('U need to add number of song in que (:')
+async def r(ctx, *, ide: int):
+    global loljs
+    init(ctx)
+    await ctx.send(
+        "{} has been removed from que".format(loljs[ctx.guild.id]['que'][int(ide - 1)]['tit']))
+    del loljs[ctx.guild.id]['que'][int(ide - 1)]
+
+
 
 
 @bot.command(brief="shows songs in que", help="just .que LOOOOL")
@@ -268,16 +266,7 @@ async def q(ctx, nam=1):
     await ctx.invoke(bot.get_command('que'), nam=nam)
 
 
-@bot.command(brief="cringe", help="cringe")
-async def cringe(ctx):
-    await ctx.channel.send("https://im.ezgif.com/tmp/ezgif-1-37968d44d448.gif")
-
-
-@bot.command(brief="nya", help="nya")
-async def nya(ctx):
-    await ctx.channel.send("https://im.ezgif.com/tmp/ezgif-1-37968d44d448.gif")
-
-
+###ULOZI UZIVATELI PLAYLIST
 @bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
 async def dump(ctx):
     global loljs
@@ -300,7 +289,7 @@ async def dump(ctx):
     with open('save.json', 'w') as f:
         json.dump(filee, f)
 
-
+###NACTE UZIVATELEM ULOZENY PLAYLIST
 @bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
 async def load(ctx):
     global loljs
@@ -346,7 +335,7 @@ async def play(ctx, *, urlee=None):
     await ctx.invoke(bot.get_command('p'), urlee=urlee)
 
 
-@bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
+@bot.command(brief="Plays a video or playlist from a link", help="song name or URL")
 async def crp(ctx):
     init(ctx)
     global loljs
@@ -363,7 +352,6 @@ async def crp(ctx):
         embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                          icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
         embed.set_thumbnail(url=loljs[ctx.guild.id]["crpe"]['thumb'])
-        # embed.add_field(name='lenght', value='10:24', inline=True)
         embed.add_field(name='status', value='playing', inline=False)
         embed.add_field(name='commands', value='_', inline=False)
         embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
@@ -374,7 +362,7 @@ async def crp(ctx):
         await message.add_reaction('⏸️')
         await message.add_reaction('❗')
         await message.add_reaction('⏩')
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
         loljs[ctx.guild.id]['rpm']['mid'] = message.id
         loljs[ctx.guild.id]['rpm']['chid'] = ctx.channel.id
     else:
@@ -389,12 +377,13 @@ async def p(ctx, *, urlee=None):
         global loljs
 
         ###INITS SERVER
+        ###PRIDA SERVER DO DICTIONARY
         init(ctx)
 
         ###YTDL FFMPEG SETTINGS
+        #NASTAVENI PRO FFMPEG/YOUTUBE_DL
         # ==========================================================================================================================
         # ==========================================================================================================================
-        # YDL_OPTIONS = {'default_search': 'auto', 'format': 'bestaudio', 'noplaylist': 'true', 'quiet': 'true'}
         YDL_OPTIONS = {'format': 'bestaudio/best',
                        'restrictfilenames': True,
                        'noplaylist': True,
@@ -416,13 +405,15 @@ async def p(ctx, *, urlee=None):
         else:
 
             ###INIT YTDL
+            ###LIBRARY PREZ KTEROU SE EXTRAHUJI INFORMACE O VIDEU
             with YoutubeDL(YDL_OPTIONS) as ydl:
-
-                ###HANDLE PLAYLIST/VIDEOS
                 if urlee != "":
+                    #NACTE CACHE PRO SONGY
                     with open('cache.json', 'r+') as f:
                         cache = json.load(f)
+                        #ZKONTOLUJE POKUD JE VIDEO V CACHE, POKUD NE EXTRAHUJE INFORMACE A PRIDA HO PRO SNIZENI ODEZVY BOTA
                         if not urlee in cache:
+
                             try:
                                 info = ydl.extract_info(urlee, download=False)
                                 if 'entries' in info and info['entries'] == []:
@@ -517,11 +508,13 @@ async def p(ctx, *, urlee=None):
                             loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = tit
 
                             ###CONNECT
+                            ###PRIPOJI BOTA POKUD NENI PRIPOJEN
                             if not is_connected(ctx):
                                 channel = ctx.author.voice.channel
                                 await channel.connect()
 
                             ###SEND EMBED
+                            ###POSLE SONG KTERY SE PRDAL DO PORADI
                             embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',
                                                   colour=discord.Colour.from_rgb(re.randrange(0, 255), 0,
                                                                                  re.randrange(0, 255)))
@@ -555,6 +548,7 @@ async def p(ctx, *, urlee=None):
                                     if loljs[ctx.guild.id]['que']:
 
                                         ###LOOP
+                                        ###SPRAVOVANI PRAVE HRANEHO SONGU
                                         loop = loljs[ctx.guild.id]['loop']
                                         if loop:
                                             if urlee == '':
@@ -566,9 +560,18 @@ async def p(ctx, *, urlee=None):
                                                     loljs[ctx.guild.id]["crp"] = 0
 
                                         ###EXTRACT FROM JSON
+                                        #EXTRAKCE POTREBNYCH VECI Z DICTIONARY/JSONU
                                         URL = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL']
+                                        thumb = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['thumb']
+                                        URL_s = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL_s']
+                                        tit = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['tit']
+                                        ###HANDLE LOOP
+                                        loop = loljs[ctx.guild.id]['loop']
+                                        if not loop:
+                                            del loljs[ctx.guild.id]['que'][0]
 
                                         ###STREAM AUDIO
+                                        ###COD KTERY STREAMUJE VIDEO Z LINKU
                                         try:
                                             voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                                         except:
@@ -579,15 +582,15 @@ async def p(ctx, *, urlee=None):
                                         voice.is_playing()
 
                                         ###SET CRP SONG
-                                        thumb = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['thumb']
-                                        URL_s = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL_s']
-                                        tit = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['tit']
+                                        ###NASTAVI PRAVE HRAJICI SONG
                                         loljs[ctx.guild.id]["crpe"]['tit'] = tit
                                         loljs[ctx.guild.id]["crpe"]['URL_s'] = URL_s
                                         loljs[ctx.guild.id]["crpe"]['thumb'] = thumb
                                         loljs[ctx.guild.id]["crpe"]['URL'] = URL
 
+
                                         ###UPDATE CRP COMMAND
+                                        ###UPDATNE CRP ZPRAVU S PRAVE HRAJICIM SONGEM
                                         if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
                                             try:
                                                 embed = discord.Embed(title=loljs[ctx.guild.id]["crpe"]['tit'],
@@ -614,15 +617,12 @@ async def p(ctx, *, urlee=None):
                                                 pass
                                         else:
                                             pass
-                                        ###HANDLE LOOP
-                                        loop = loljs[ctx.guild.id]['loop']
-                                        if not loop:
-                                            del loljs[ctx.guild.id]['que'][0]
 
-                                        ###SOME BULLSHIT THAT MAKES IT WORK THIS MIGHT BE BETTER
+
+                                        ###
                                     else:
-                                        await asyncio.sleep(0.1)
-                                        validate(ctx, YDL_OPTIONS)
+                                        await asyncio.sleep(0.1)#UDRZUJE ABY SE BOT NEPREHLTIL
+                                        validate(ctx, YDL_OPTIONS)#ZKONTROLUJE JESTLI JSOU LINKY K MUSIC FILU FUNKCI A UDRZUJE JE FUNKCNI
                                 else:
                                     await asyncio.sleep(0.1)
                                     validate(ctx, YDL_OPTIONS)
@@ -638,6 +638,7 @@ async def p(ctx, *, urlee=None):
 
 
 ###INTERACRIVE CONTROL HANDELING
+###INTERAKTIVNI OVLADANI PREZ REAKCE
 @bot.event
 async def on_raw_reaction_add(payload):
     global loljs
@@ -649,7 +650,8 @@ async def on_raw_reaction_add(payload):
     message = await channel.fetch_message(payload.message_id)
     user = bot.get_user(payload.user_id)
 
-    ###HANDLED CRP COMMAND
+    #HANDLED CRP COMMAND
+    #OVLADANI NA CRP COMMAND (NAPISE SONG KTERY PRAVE HRAJE)
     if loljs[gid]['rpm']['mid'] is not None:
         if payload.message_id == loljs[gid]['rpm']['mid']:
             if payload.emoji.id is not None:
@@ -679,7 +681,8 @@ async def on_raw_reaction_add(payload):
                 if voice is not None:
                     voice.stop()
 
-    ###HANDLE QUE COMMAND
+    #HANDLE QUE COMMAND
+    #OVLADANI PRO QUE COMMAND KTERY POSLE SONGY KTERE JSOU V PORADI
     if loljs[gid]['quem']['mid'] is not None:
         if payload.message_id == loljs[gid]['quem']['mid']:
             if payload.emoji.id is not None:
@@ -713,7 +716,7 @@ async def on_raw_reaction_add(payload):
             message = await chal.fetch_message(loljs[gid]['quem']['mid'])
             await message.edit(embed=embed)
 
-
+###POKUD NEKDO MOVNE BOTA TAK NAVRATI HRAJICI SONG
 @bot.event
 async def on_voice_state_update(member, before, after):
     global loljs
@@ -735,7 +738,7 @@ async def on_voice_state_update(member, before, after):
         except:
             print('I DUNO')
 
-
+###NAPISE KDYZ JE BOT PRIPRAVEN K POUZIVANI
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -745,5 +748,5 @@ async def on_ready():
     activity = discord.Game(name=".help")
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
-
-bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.LW6f-mojf64U_QzhCzXAZIkuIHQ')
+###DISCORD BOT TOKEN
+bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.aa7_mvRDvLGXynFRRD0i6de8Ppw')
