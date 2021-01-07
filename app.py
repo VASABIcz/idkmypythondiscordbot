@@ -8,7 +8,7 @@ import asyncio
 import random as re
 import time
 
-bot = commands.Bot(command_prefix='/')
+bot = commands.Bot(command_prefix='.')
 
 loljs = {}
 ###VECI KTERE JESTE BUDU DELAT NEBO JSEM DODELAL
@@ -839,4 +839,4 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
 ###DISCORD BOT TOKEN
-bot.run('Nzc2MjAxMzc4MzAwNjkwNDUy.X6xb3Q.kgAJjt3Ps_PqiNbjFrox29zuMes')
+bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.c-g-3fDfknfZ8A2tD1PfvmNCXY0')
