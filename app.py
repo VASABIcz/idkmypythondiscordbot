@@ -113,6 +113,8 @@ def validate(ctx, YDL_OPTIONS):
     #VALIDATE CURRENT QUE
     if loljs[ctx.guild.id]['que']:
         for n in range(len(loljs[ctx.guild.id]['que'])):
+            print(n)
+            print(loljs[ctx.guild.id]['que'][n]['URL'])
             if scrap(loljs[ctx.guild.id]['que'][n]['URL']):
                 info = ydl.extract_info(loljs[ctx.guild.id]['que'][n]['URL_s'],
                                         download=False)
@@ -122,16 +124,17 @@ def validate(ctx, YDL_OPTIONS):
     #VALIDATE SAVE
     with open('save.json', 'r+') as f:
         filee = json.load(f)
-        if filee[str(ctx.author.id)]['que']:
-            for n in range(len(filee[str(ctx.author.id)]['que'])):
-                if scrap(filee[str(ctx.author.id)]['que'][n]['URL']):
-                    info = ydl.extract_info(
-                        filee[str(ctx.author.id)]['que'][n]['URL_s'],
-                        download=False)
-                    filee[str(ctx.author.id)]['que'][n]['URL'] = info['url']
-                    with open('save.json', 'w') as fe:
-                        json.dump(filee, fe)
-                    print('validated save')
+        if filee != {}:
+            if filee[str(ctx.author.id)]['que']:
+                for n in range(len(filee[str(ctx.author.id)]['que'])):
+                    if scrap(filee[str(ctx.author.id)]['que'][n]['URL']):
+                        info = ydl.extract_info(
+                            filee[str(ctx.author.id)]['que'][n]['URL_s'],
+                            download=False)
+                        filee[str(ctx.author.id)]['que'][n]['URL'] = info['url']
+                        with open('save.json', 'w') as fe:
+                            json.dump(filee, fe)
+                        print('validated save')
 
     #VALIDATE CACHE
     with open('cache.json', 'r+') as f:
