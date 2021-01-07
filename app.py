@@ -113,7 +113,6 @@ def validate(ctx, YDL_OPTIONS):
     #VALIDATE CURRENT QUE
     if loljs[ctx.guild.id]['que']:
         for n in range(len(loljs[ctx.guild.id]['que'])):
-            print(n)
             print(loljs[ctx.guild.id]['que'][n]['URL'])
             if scrap(loljs[ctx.guild.id]['que'][n]['URL']):
                 info = ydl.extract_info(loljs[ctx.guild.id]['que'][n]['URL_s'],
