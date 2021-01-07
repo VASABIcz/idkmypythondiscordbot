@@ -8,7 +8,7 @@ import asyncio
 import random as re
 import time
 
-bot = commands.Bot(command_prefix='.')
+bot = commands.Bot(command_prefix='/')
 
 loljs = {}
 ###VECI KTERE JESTE BUDU DELAT NEBO JSEM DODELAL
@@ -20,18 +20,25 @@ loljs = {}
 # TODO fix connect command
 # DONE
 # TODO on_voice_state_update
-# testing in progres
+# testing in progres/fixed
 # TODO BETER LINK VALIDATING/ CACHING
 # DONE
 # TODO volume controll command
 #
 # TODO LEPSI LOOP SPRAVOVANI
-#
+# nah
 # TODO OBECNE ZRYCHLENI BOTA
 #
 # TODO ODSTRANENI ERRORU PRI POSOUVANI BOTA MEZI CHANNELY(ciste esteticke)
-#
+# nah
 # TODO FIXOVANI MENSICH BUGU
+#
+# TODO skip_to
+#
+# TODO crp playing status will update with pause/play
+#
+
+
 
 ###PRIDANI SERVRU DO DICTIONARY
 def init(ctx):
@@ -149,6 +156,29 @@ def validate(ctx, YDL_OPTIONS):
                         json.dump(filee, fe)
                     print('validated cache {}'.format(lil[n]))
 
+
+async def crep(gid, x):
+    embed = discord.Embed(title=loljs[gid]["crpe"]['tit'],
+                          url=loljs[gid]["crpe"]['URL_s'],
+                          colour=discord.Colour.from_rgb(
+                              re.randrange(0, 255),
+                              0,
+                              re.randrange(0, 255)))
+    embed.set_author(name='VASABI',
+                     url='https://github.com/VASABIcz/Simple-discord-music-bot',
+                     icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
+    embed.set_thumbnail(url=loljs[gid]["crpe"]['thumb'])
+    embed.add_field(name='lenght', value='10:24', inline=True)
+    embed.add_field(name='status', value=x, inline=False)
+    embed.add_field(name='commands', value='_', inline=False)
+    embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
+    embed.add_field(name='❗️', value='**`disconnect`**', inline=True)
+    embed.add_field(name='⏩', value='**`skip`**',
+                    inline=True)  # **`aaaaaaa`**
+    chal = bot.get_channel(int(loljs[gid]['rpm']['chid']))
+    message = await chal.fetch_message(loljs[gid]['rpm']['mid'])
+    await message.edit(embed=embed)
+
 #PRESKOCENI PRAVE HRAJICIHO SONGU
 @bot.command(brief="skips a song")
 async def skip(ctx):
@@ -206,7 +236,16 @@ async def connect(ctx):
         await channel.connect()
     else:
         await channel.connect()
+        
+        
+@bot.command(brief="...")
+async def c(ctx):
+    await ctx.invoke(bot.get_command('connect'))
 
+@bot.command(brief="...")
+async def join(ctx):
+    await ctx.invoke(bot.get_command('connect'))
+    
 #ODPOJI BOTA
 @bot.command(brief="disconects bot from voice channel")
 async def d(ctx):
@@ -215,6 +254,11 @@ async def d(ctx):
     voice.stop()
     await server.disconnect()
     await ctx.send("U DcD me D:")
+    
+    
+@bot.command(brief="disconects bot from voice channel")
+async def dc(ctx):
+    await ctx.invoke(bot.get_command('d'))
 
 ###VIPISE SONGY V RADE
 @bot.command(brief="shows songs in que", help="just .que LOOOOL")
@@ -247,7 +291,6 @@ async def que(ctx, nam=1):
     await message.add_reaction('◀️')
     await message.add_reaction('▶️')
     await message.add_reaction('🔄')
-    await asyncio.sleep(2)
     loljs[ctx.guild.id]['quem']['mid'] = message.id
     loljs[ctx.guild.id]['quem']['chid'] = ctx.channel.id
     loljs[ctx.guild.id]['quem']['pg'] = nam
@@ -260,8 +303,6 @@ async def r(ctx, *, ide: int):
     await ctx.send(
         "{} has been removed from que".format(loljs[ctx.guild.id]['que'][int(ide - 1)]['tit']))
     del loljs[ctx.guild.id]['que'][int(ide - 1)]
-
-
 
 
 @bot.command(brief="shows songs in que", help="just .que LOOOOL")
@@ -365,7 +406,6 @@ async def crp(ctx):
         await message.add_reaction('⏸️')
         await message.add_reaction('❗')
         await message.add_reaction('⏩')
-        await asyncio.sleep(2)
         loljs[ctx.guild.id]['rpm']['mid'] = message.id
         loljs[ctx.guild.id]['rpm']['chid'] = ctx.channel.id
     else:
@@ -569,9 +609,8 @@ async def p(ctx, *, urlee=None):
                                         URL_s = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL_s']
                                         tit = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['tit']
                                         ###HANDLE LOOP
-                                        loop = loljs[ctx.guild.id]['loop']
                                         if not loop:
-                                            del loljs[ctx.guild.id]['que'][0]
+                                            del loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]
 
                                         ###STREAM AUDIO
                                         ###COD KTERY STREAMUJE VIDEO Z LINKU
@@ -606,7 +645,7 @@ async def p(ctx, *, urlee=None):
                                                                  url='https://github.com/VASABIcz/Simple-discord-music-bot',
                                                                  icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
                                                 embed.set_thumbnail(url=loljs[ctx.guild.id]["crpe"]['thumb'])
-                                                # embed.add_field(name='lenght', value='10:24', inline=True)
+                                                embed.add_field(name='lenght', value='10:24', inline=True)
                                                 embed.add_field(name='status', value='playing', inline=False)
                                                 embed.add_field(name='commands', value='_', inline=False)
                                                 embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
@@ -622,7 +661,6 @@ async def p(ctx, *, urlee=None):
                                             pass
 
 
-                                        ###
                                     else:
                                         await asyncio.sleep(0.1)#UDRZUJE ABY SE BOT NEPREHLTIL
                                         validate(ctx, YDL_OPTIONS)#ZKONTROLUJE JESTLI JSOU LINKY K MUSIC FILU FUNKCI A UDRZUJE JE FUNKCNI
@@ -640,6 +678,8 @@ async def p(ctx, *, urlee=None):
                         validate(ctx, YDL_OPTIONS)
 
 
+
+
 ###INTERACRIVE CONTROL HANDELING
 ###INTERAKTIVNI OVLADANI PREZ REAKCE
 @bot.event
@@ -655,69 +695,114 @@ async def on_raw_reaction_add(payload):
 
     #HANDLED CRP COMMAND
     #OVLADANI NA CRP COMMAND (NAPISE SONG KTERY PRAVE HRAJE)
-    if loljs[gid]['rpm']['mid'] is not None:
-        if payload.message_id == loljs[gid]['rpm']['mid']:
-            if payload.emoji.id is not None:
-                emoji = bot.get_emoji(payload.emoji.id)
-            else:
-                emoji = payload.emoji.name
-            await message.remove_reaction(emoji, user)
-            if payload.emoji.name == '⏸️':
-                guild = bot.get_guild(gid)
-                voice = get(bot.voice_clients, guild=guild)
-                voice.pause()
-            if payload.emoji.name == '▶️':
-                guild = bot.get_guild(gid)
-                voice = get(bot.voice_clients, guild=guild)
-                voice.resume()
-            if payload.emoji.name == '❗':
-                guild = bot.get_guild(gid)
-                voice = get(bot.voice_clients, guild=guild)
-                loljs[gid]['que'] = []
-                loljs[gid]['crp'] = 0
-                if voice:
-                    if voice.is_playing():
+    if payload.user_id != bot.user.id:
+        if loljs[gid]['rpm']['mid'] is not None:
+            if payload.message_id == loljs[gid]['rpm']['mid']:
+                if payload.emoji.id is not None:
+                    emoji = bot.get_emoji(payload.emoji.id)
+                else:
+                    emoji = payload.emoji.name
+                await message.remove_reaction(emoji, user)
+                if payload.emoji.name == '⏸️':
+                    guild = bot.get_guild(gid)
+                    voice = get(bot.voice_clients, guild=guild)
+                    voice.pause()
+                    try:
+                        embed = discord.Embed(title=loljs[gid]["crpe"]['tit'],
+                                              url=loljs[gid]["crpe"]['URL_s'],
+                                              colour=discord.Colour.from_rgb(
+                                                  re.randrange(0, 255),
+                                                  0,
+                                                  re.randrange(0, 255)))
+                        embed.set_author(name='VASABI',
+                                         url='https://github.com/VASABIcz/Simple-discord-music-bot',
+                                         icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
+                        embed.set_thumbnail(url=loljs[gid]["crpe"]['thumb'])
+                        embed.add_field(name='status', value='paused', inline=False)
+                        embed.add_field(name='commands', value='_', inline=False)
+                        embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
+                        embed.add_field(name='❗️', value='**`disconnect`**', inline=True)
+                        embed.add_field(name='⏩', value='**`skip`**',
+                                        inline=True)  # **`aaaaaaa`**
+                        chal = bot.get_channel(int(loljs[gid]['rpm']['chid']))
+                        message = await chal.fetch_message(loljs[gid]['rpm']['mid'])
+                        await message.edit(embed=embed)
+                    except:
+                        pass
+                if payload.emoji.name == '▶️':
+                    guild = bot.get_guild(gid)
+                    voice = get(bot.voice_clients, guild=guild)
+                    voice.resume()
+                    try:
+                        embed = discord.Embed(title=loljs[gid]["crpe"]['tit'],
+                                              url=loljs[gid]["crpe"]['URL_s'],
+                                              colour=discord.Colour.from_rgb(
+                                                  re.randrange(0, 255),
+                                                  0,
+                                                  re.randrange(0, 255)))
+                        embed.set_author(name='VASABI',
+                                         url='https://github.com/VASABIcz/Simple-discord-music-bot',
+                                         icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
+                        embed.set_thumbnail(url=loljs[gid]["crpe"]['thumb'])
+                        embed.add_field(name='status', value='playing', inline=False)
+                        embed.add_field(name='commands', value='_', inline=False)
+                        embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
+                        embed.add_field(name='❗️', value='**`disconnect`**', inline=True)
+                        embed.add_field(name='⏩', value='**`skip`**',
+                                        inline=True)  # **`aaaaaaa`**
+                        chal = bot.get_channel(int(loljs[gid]['rpm']['chid']))
+                        message = await chal.fetch_message(loljs[gid]['rpm']['mid'])
+                        await message.edit(embed=embed)
+                    except:
+                        pass
+                if payload.emoji.name == '❗':
+                    guild = bot.get_guild(gid)
+                    voice = get(bot.voice_clients, guild=guild)
+                    loljs[gid]['que'] = []
+                    loljs[gid]['crp'] = 0
+                    if voice:
+                        if voice.is_playing():
+                            voice.stop()
+                        await voice.disconnect()
+
+                if payload.emoji.name == '⏩':
+                    guild = bot.get_guild(gid)
+                    voice = get(bot.voice_clients, guild=guild)
+                    if voice is not None:
                         voice.stop()
-            if payload.emoji.name == '⏩':
-                guild = bot.get_guild(gid)
-                voice = get(bot.voice_clients, guild=guild)
-                if voice is not None:
-                    voice.stop()
 
-    #HANDLE QUE COMMAND
-    #OVLADANI PRO QUE COMMAND KTERY POSLE SONGY KTERE JSOU V PORADI
-    if loljs[gid]['quem']['mid'] is not None:
-        if payload.message_id == loljs[gid]['quem']['mid']:
-            if payload.emoji.id is not None:
-                emoji = bot.get_emoji(payload.emoji.id)
-            else:
-                emoji = payload.emoji.name
-            await message.remove_reaction(emoji, user)
-            if payload.emoji.name == '▶️':
-                loljs[gid]['quem']['pg'] += 1
-            if payload.emoji.name == '◀️':
-                if loljs[gid]['quem']['pg'] > 1:
-                    loljs[gid]['quem']['pg'] += -1
-            if payload.emoji.name == '🔄':
-                pass
-
-            nam = loljs[gid]['quem']['pg']
-            qee = loljs[gid]['que']
-            embed = discord.Embed(title="QUE (:", description="Song que",
-                                  colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
-            embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
-                             icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
-            for i in range(5):
-                try:
-                    embed.add_field(name=qee[int(i + (nam * 5) - 5)]['tit'], value=str(i + 1 + (nam * 5) - 5),
-                                    inline=False)
-                except:
+        # HANDLE QUE COMMAND
+        # OVLADANI PRO QUE COMMAND KTERY POSLE SONGY KTERE JSOU V PORADI
+        if loljs[gid]['quem']['mid'] is not None:
+            if payload.message_id == loljs[gid]['quem']['mid']:
+                if payload.emoji.id is not None:
+                    emoji = bot.get_emoji(payload.emoji.id)
+                else:
+                    emoji = payload.emoji.name
+                await message.remove_reaction(emoji, user)
+                if payload.emoji.name == '▶️':
+                    loljs[gid]['quem']['pg'] += 1
+                if payload.emoji.name == '◀️':
+                    if loljs[gid]['quem']['pg'] > 1:
+                        loljs[gid]['quem']['pg'] += -1
+                if payload.emoji.name == '🔄':
                     pass
-
-            embed.set_footer(text="page<{}>".format(nam))
-            chal = bot.get_channel(int(loljs[gid]['quem']['chid']))
-            message = await chal.fetch_message(loljs[gid]['quem']['mid'])
-            await message.edit(embed=embed)
+                nam = loljs[gid]['quem']['pg']
+                qee = loljs[gid]['que']
+                embed = discord.Embed(title="QUE (:", description="Song que",
+                                      colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
+                embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
+                                 icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
+                for i in range(5):
+                    try:
+                        embed.add_field(name=qee[int(i + (nam * 5) - 5)]['tit'], value=str(i + 1 + (nam * 5) - 5),
+                                        inline=False)
+                    except:
+                        pass
+                embed.set_footer(text="page<{}>".format(nam))
+                chal = bot.get_channel(int(loljs[gid]['quem']['chid']))
+                message = await chal.fetch_message(loljs[gid]['quem']['mid'])
+                await message.edit(embed=embed)
 
 ###POKUD NEKDO MOVNE BOTA TAK NAVRATI HRAJICI SONG
 @bot.event
@@ -726,21 +811,23 @@ async def on_voice_state_update(member, before, after):
     if after is None:
         pass
     else:
-        try:
-            gid = after.channel.guild.id
-            init(gid)
-            if member.id == bot.user.id:
-                if loljs[gid]["crpe"]['URL_s'] is not None:
-                    loljs[gid]['que'].insert(0, {})
-                    loljs[gid]['que'][0]['URL'] = loljs[gid]["crpe"]['URL']
-                    loljs[gid]['que'][0]['URL_s'] = loljs[gid]["crpe"][
-                        'URL_s']
-                    loljs[gid]['que'][0]['thumb'] = loljs[gid]["crpe"][
-                        'thumb']
-                    loljs[gid]['que'][0]['tit'] = loljs[gid]["crpe"]['tit']
-        except:
-            print('I DUNO')
-
+        if before.channel != after.channel:
+            try:
+                gid = after.channel.guild.id
+                init(gid)
+                if member.id == bot.user.id:
+                    if loljs[gid]["crpe"]['URL_s'] is not None:
+                        print('bruh')
+                        loljs[gid]['que'].insert(0, {})
+                        loljs[gid]['que'][0]['URL'] = loljs[gid]["crpe"]['URL']
+                        loljs[gid]['que'][0]['URL_s'] = loljs[gid]["crpe"][
+                            'URL_s']
+                        loljs[gid]['que'][0]['thumb'] = loljs[gid]["crpe"][
+                            'thumb']
+                        loljs[gid]['que'][0]['tit'] = loljs[gid]["crpe"]['tit']
+                        print(loljs[gid]['que'])
+            except:
+                print('I DUNO')
 ###NAPISE KDYZ JE BOT PRIPRAVEN K POUZIVANI
 @bot.event
 async def on_ready():
@@ -752,4 +839,4 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
 ###DISCORD BOT TOKEN
-bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.c-g-3fDfknfZ8A2tD1PfvmNCXY0')
+bot.run('Nzc2MjAxMzc4MzAwNjkwNDUy.X6xb3Q.kgAJjt3Ps_PqiNbjFrox29zuMes')
