@@ -8,11 +8,12 @@ import asyncio
 import random as re
 import time
 import os
+from dotenv import load_dotenv
 
-
-pref = os.getenv('PREF')
-bot = commands.Bot(command_prefix=pref)
-TOKEN = os.getenv('TOKEN')
+load_dotenv('.env')
+PREF = os.environ['PREF']
+TOKEN = os.environ['TOKEN']
+bot = commands.Bot(command_prefix=PREF)
 loljs = {}
 ###VECI KTERE JESTE BUDU DELAT NEBO JSEM DODELAL
 # TODO new HELP command
