@@ -752,4 +752,4 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
 ###DISCORD BOT TOKEN
-bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.aa7_mvRDvLGXynFRRD0i6de8Ppw')
+bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.c-g-3fDfknfZ8A2tD1PfvmNCXY0')
