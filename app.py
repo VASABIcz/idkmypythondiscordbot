@@ -9,10 +9,10 @@ import random as re
 import time
 import os
 
-bot = commands.Bot(command_prefix='/')
-#os.environ['TOKEN'] = 'Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.c-g-3fDfknfZ8A2tD1PfvmNCXY0'
+
+pref = os.getenv('PREF')
+bot = commands.Bot(command_prefix=pref)
 TOKEN = os.getenv('TOKEN')
-print(TOKEN)
 loljs = {}
 ###VECI KTERE JESTE BUDU DELAT NEBO JSEM DODELAL
 # TODO new HELP command
