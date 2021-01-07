@@ -4,5 +4,3 @@ youtube_dl
 PyNaCl
 aiohttp
 opuslib
-dotenv
-random
