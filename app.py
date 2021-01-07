@@ -7,9 +7,12 @@ import json
 import asyncio
 import random as re
 import time
+import os
 
-bot = commands.Bot(command_prefix='.')
-
+bot = commands.Bot(command_prefix='/')
+#os.environ['TOKEN'] = 'Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.c-g-3fDfknfZ8A2tD1PfvmNCXY0'
+TOKEN = os.getenv('TOKEN')
+print(TOKEN)
 loljs = {}
 ###VECI KTERE JESTE BUDU DELAT NEBO JSEM DODELAL
 # TODO new HELP command
@@ -236,8 +239,8 @@ async def connect(ctx):
         await channel.connect()
     else:
         await channel.connect()
-        
-        
+
+
 @bot.command(brief="...")
 async def c(ctx):
     await ctx.invoke(bot.get_command('connect'))
@@ -245,7 +248,7 @@ async def c(ctx):
 @bot.command(brief="...")
 async def join(ctx):
     await ctx.invoke(bot.get_command('connect'))
-    
+
 #ODPOJI BOTA
 @bot.command(brief="disconects bot from voice channel")
 async def d(ctx):
@@ -254,8 +257,8 @@ async def d(ctx):
     voice.stop()
     await server.disconnect()
     await ctx.send("U DcD me D:")
-    
-    
+
+
 @bot.command(brief="disconects bot from voice channel")
 async def dc(ctx):
     await ctx.invoke(bot.get_command('d'))
@@ -839,4 +842,4 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
 ###DISCORD BOT TOKEN
-bot.run('Njk1MjY5OTE3NjcwMjQ0Mzk0.XoXukQ.c-g-3fDfknfZ8A2tD1PfvmNCXY0')
+bot.run(TOKEN)
