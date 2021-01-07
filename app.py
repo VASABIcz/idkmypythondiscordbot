@@ -107,7 +107,6 @@ def scrap(URL):
 
 ###COMAND PRO KONTROLU FUNKCNOSTI LINKU
 def validate(ctx, YDL_OPTIONS):
-    global loljs
     ydl = YoutubeDL(YDL_OPTIONS)
     ###VALIDATE ALL LINKS WHILE PLAYING ANOTHER SONG TO BYPASS USER WAITING FOR VALIDATION
 
@@ -127,16 +126,18 @@ def validate(ctx, YDL_OPTIONS):
         filee = json.load(f)
         if filee != {}:
             if filee[str(ctx.author.id)]['que']:
-                for n in range(len(filee[str(ctx.author.id)]['que'])):
-                    if scrap(filee[str(ctx.author.id)]['que'][n]['URL']):
-                        info = ydl.extract_info(
-                            filee[str(ctx.author.id)]['que'][n]['URL_s'],
-                            download=False)
-                        filee[str(ctx.author.id)]['que'][n]['URL'] = info['url']
-                        with open('save.json', 'w') as fe:
-                            json.dump(filee, fe)
-                        print('validated save')
-
+                try:
+                    for n in range(len(filee[str(ctx.author.id)]['que'])):
+                        if scrap(filee[str(ctx.author.id)]['que'][n]['URL']):
+                            info = ydl.extract_info(
+                                filee[str(ctx.author.id)]['que'][n]['URL_s'],
+                                download=False)
+                            filee[str(ctx.author.id)]['que'][n]['URL'] = info['url']
+                            with open('save.json', 'w') as fe:
+                                json.dump(filee, fe)
+                            print('validated save')
+                except:
+                    pass
     #VALIDATE CACHE
     with open('cache.json', 'r+') as f:
         filee = json.load(f)
