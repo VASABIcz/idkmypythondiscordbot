@@ -524,8 +524,9 @@ async def p(ctx, *, urlee=None, fp=None):
 
                                     ###CONNECT
                                     if not is_connected(ctx):
-                                        channel = ctx.author.voice.channel
-                                        await channel.connect()
+                                        channel = ctx.author.voice.channel.id
+                                        chl = await bot.fetch_channel(channel)
+                                        await chl.connect()
 
                                     ###SEND EMBED
                                     embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',colour=discord.Colour.from_rgb(re.randrange(0, 255), 0,re.randrange(0, 255)))
@@ -693,7 +694,7 @@ async def on_raw_reaction_add(payload):
     init(gid)
     channel = bot.get_channel(payload.channel_id)
     message = await channel.fetch_message(payload.message_id)
-    user = bot.get_user(payload.user_id)
+    user = await bot.fetch_user(payload.user_id)
 
     #HANDLED CRP COMMAND
     #OVLADANI NA CRP COMMAND (NAPISE SONG KTERY PRAVE HRAJE)
