@@ -28,19 +28,23 @@ loljs = {}
 # TODO BETER LINK VALIDATING/ CACHING
 # DONE
 # TODO volume controll command
-#
+# nn
 # TODO LEPSI LOOP SPRAVOVANI
 # nah
-# TODO OBECNE ZRYCHLENI BOTA
-#
 # TODO ODSTRANENI ERRORU PRI POSOUVANI BOTA MEZI CHANNELY(ciste esteticke)
 # nah
 # TODO FIXOVANI MENSICH BUGU
 #
 # TODO skip_to
-#
+# pls dont
 # TODO crp playing status will update with pause/play
-#
+# DONE
+# TODO CACHE ADD PLAYLIST SUPPORT
+# DONE
+# TODO r command fix
+# DONE
+# TODO force play(forces extracting frum url)
+# DONE
 
 
 
@@ -153,12 +157,13 @@ def validate(ctx, YDL_OPTIONS):
         if filee != {}:
             for n in range(len(filee)):
                 lil = list(filee)
-                if scrap(filee[lil[n]]['URL']):
-                    info = ydl.extract_info(filee[lil[n]]['URL_s'],download=False)
-                    filee[lil[n]]['URL'] = info['url']
-                    with open('cache.json', 'w') as fe:
-                        json.dump(filee, fe)
-                    print('validated cache {}'.format(lil[n]))
+                for i in range(len(filee[lil[n]])):
+                    if scrap(filee[lil[n]][i]['URL']):
+                        info = ydl.extract_info(filee[lil[n]][i]['URL_s'], download=False)
+                        filee[lil[n]][i]['URL'] = info['url']
+                        with open('cache.json', 'w') as fe:
+                            json.dump(filee, fe)
+                        print('validated cache {}'.format(lil[n]))
 
 
 async def crep(gid, x):
@@ -301,12 +306,16 @@ async def que(ctx, nam=1):
 
 ###COMMAND PRO ODSTRANENI SONGU Z RADY
 @bot.command(brief="remove 1 specific song from que ", help=".r number of song (use .que)")
-async def r(ctx, *, ide: int):
+async def r(ctx, ide):
     global loljs
     init(ctx)
-    await ctx.send(
-        "{} has been removed from que".format(loljs[ctx.guild.id]['que'][int(ide - 1)]['tit']))
-    del loljs[ctx.guild.id]['que'][int(ide - 1)]
+    try:
+        ide = int(ide)
+        await ctx.send(
+            "{} has been removed from que".format(loljs[ctx.guild.id]['que'][int(ide - 1)]['tit']))
+        del loljs[ctx.guild.id]['que'][int(ide - 1)]
+    except:
+        await ctx.channel.send('BAD D:')
 
 
 @bot.command(brief="shows songs in que", help="just .que LOOOOL")
@@ -383,6 +392,11 @@ async def play(ctx, *, urlee=None):
     await ctx.invoke(bot.get_command('p'), urlee=urlee)
 
 
+@bot.command(brief="plays and updates song in cache", help="song name or URL")
+async def fp(ctx, *, urlee=None):
+    await ctx.invoke(bot.get_command('p'), urlee=urlee, fp=True)
+
+
 @bot.command(brief="Plays a video or playlist from a link", help="song name or URL")
 async def crp(ctx):
     init(ctx)
@@ -417,7 +431,7 @@ async def crp(ctx):
 
 
 @bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
-async def p(ctx, *, urlee=None):
+async def p(ctx, *, urlee=None, fp=None):
     if urlee is None:
         await ctx.send(" U need to give a song name or URL (:")
     else:
@@ -459,14 +473,14 @@ async def p(ctx, *, urlee=None):
                     with open('cache.json', 'r+') as f:
                         cache = json.load(f)
                         #ZKONTOLUJE POKUD JE VIDEO V CACHE, POKUD NE EXTRAHUJE INFORMACE A PRIDA HO PRO SNIZENI ODEZVY BOTA
-                        if not urlee in cache:
-
+                        if not urlee in cache or fp is True:
                             try:
                                 info = ydl.extract_info(urlee, download=False)
                                 if 'entries' in info and info['entries'] == []:
                                     await ctx.send("BAD")
                                 else:
                                     if 'youtube.com/playlist?list=' in urlee:
+                                        cache[urlee] = []
                                         for i in range(len(info['entries'])):
                                             loljs[ctx.guild.id]['que'].append({})
                                             thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1][
@@ -480,42 +494,31 @@ async def p(ctx, *, urlee=None):
                                             tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1][
                                                 'tit'] = \
                                                 info['entries'][i]['title']
-                                            print(i)
+                                            cache[urlee].append({})
+                                            cache[urlee][len(cache[urlee])-1]['URL'] = URL
+                                            cache[urlee][len(cache[urlee])-1]['tit'] = tit
+                                            cache[urlee][len(cache[urlee])-1]['thumb'] = thumb
+                                            cache[urlee][len(cache[urlee])-1]['URL_s'] = URL_s
                                         await ctx.send('playlist is loaded')
                                     else:
                                         if 'entries' not in info:
                                             loljs[ctx.guild.id]['que'].append({})
-                                            thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1][
-                                                'thumb'] = \
-                                                info['thumbnail']
-                                            URL = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = \
-                                            info['url']
-                                            URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1][
-                                                'URL_s'] = \
-                                                info[
-                                                    'webpage_url']
-                                            tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1][
-                                                'tit'] = info[
-                                                'title']
+                                            thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = info['thumbnail']
+                                            URL = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = info['url']
+                                            URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = info['webpage_url']
+                                            tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = info['title']
                                         else:
                                             loljs[ctx.guild.id]['que'].append({})
-                                            thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1][
-                                                'thumb'] = \
-                                                info['entries'][0]['thumbnail']
-                                            URL = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1][
-                                                'URL'] = \
-                                                info['entries'][0]['url']
-                                            URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1][
-                                                'URL_s'] = \
-                                                info['entries'][0]['webpage_url']
-                                            tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1][
-                                                'tit'] = \
-                                                info['entries'][0]['title']
-                                    cache[urlee] = {}
-                                    cache[urlee]['URL'] = URL
-                                    cache[urlee]['tit'] = tit
-                                    cache[urlee]['thumb'] = thumb
-                                    cache[urlee]['URL_s'] = URL_s
+                                            thumb = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = info['entries'][0]['thumbnail']
+                                            URL = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = info['entries'][0]['url']
+                                            URL_s = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = info['entries'][0]['webpage_url']
+                                            tit = loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = info['entries'][0]['title']
+                                        cache[urlee] = []
+                                        cache[urlee].append({})
+                                        cache[urlee][len(cache[urlee]) - 1]['URL'] = URL
+                                        cache[urlee][len(cache[urlee]) - 1]['tit'] = tit
+                                        cache[urlee][len(cache[urlee]) - 1]['thumb'] = thumb
+                                        cache[urlee][len(cache[urlee]) - 1]['URL_s'] = URL_s
                                     with open('cache.json', 'w') as fe:
                                         json.dump(cache, fe)
 
@@ -541,18 +544,13 @@ async def p(ctx, *, urlee=None):
                                 pass
 
                         else:
-                            URL = cache[urlee]['URL']
-                            tit = cache[urlee]['tit']
-                            thumb = cache[urlee]['thumb']
-                            URL_s = cache[urlee]['URL_s']
-                            if scrap(URL):
-                                info = ydl.extract_info(URL_s, download=False)
-                                URL = info['url']
-                            loljs[ctx.guild.id]['que'].append({})
-                            loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['thumb'] = thumb
-                            loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL'] = URL
-                            loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['URL_s'] = URL_s
-                            loljs[ctx.guild.id]['que'][len(loljs[ctx.guild.id]['que']) - 1]['tit'] = tit
+                            for l in range(len(cache[urlee])):
+                                loljs[ctx.guild.id]['que'].append(cache[urlee][l])
+
+                            #URL = cache[urlee][len(cache[urlee])-1]['URL']
+                            tit = cache[urlee][len(cache[urlee])-1]['tit']
+                            thumb = cache[urlee][len(cache[urlee])-1]['thumb']
+                            URL_s = cache[urlee][len(cache[urlee])-1]['URL_s']
 
                             ###CONNECT
                             ###PRIPOJI BOTA POKUD NENI PRIPOJEN
@@ -821,15 +819,17 @@ async def on_voice_state_update(member, before, after):
                 init(gid)
                 if member.id == bot.user.id:
                     if loljs[gid]["crpe"]['URL_s'] is not None:
-                        print('bruh')
-                        loljs[gid]['que'].insert(0, {})
-                        loljs[gid]['que'][0]['URL'] = loljs[gid]["crpe"]['URL']
-                        loljs[gid]['que'][0]['URL_s'] = loljs[gid]["crpe"][
-                            'URL_s']
-                        loljs[gid]['que'][0]['thumb'] = loljs[gid]["crpe"][
-                            'thumb']
-                        loljs[gid]['que'][0]['tit'] = loljs[gid]["crpe"]['tit']
-                        print(loljs[gid]['que'])
+                        if loljs[gid]['loop']:
+                            loljs[gid]['crp'] += -1
+                        else:
+                            loljs[gid]['que'].insert(0, {})
+                            loljs[gid]['que'][0]['URL'] = loljs[gid]["crpe"]['URL']
+                            loljs[gid]['que'][0]['URL_s'] = loljs[gid]["crpe"][
+                                'URL_s']
+                            loljs[gid]['que'][0]['thumb'] = loljs[gid]["crpe"][
+                                'thumb']
+                            loljs[gid]['que'][0]['tit'] = loljs[gid]["crpe"]['tit']
+
             except:
                 print('I DUNO')
 ###NAPISE KDYZ JE BOT PRIPRAVEN K POUZIVANI
