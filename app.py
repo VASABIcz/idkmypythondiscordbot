@@ -478,7 +478,10 @@ async def p(ctx, *, urlee=None, fp=None):
                         #ZKONTOLUJE POKUD JE VIDEO V CACHE, POKUD NE EXTRAHUJE INFORMACE A PRIDA HO PRO SNIZENI ODEZVY BOTA
                         if not urlee in cache or fp is True:
                             try:
-                                info = ydl.extract_info(urlee, download=False)
+                                ### I FUCKING DONT KNOW HOW THIS WORKS BUT IT DOES (: yoinked it from ofic bot
+                                #bruh just 2 random lines and it's async
+                                loop = asyncio.get_event_loop()
+                                info = await loop.run_in_executor(None, lambda: ydl.extract_info(urlee, download=False))
                                 if 'entries' in info and info['entries'] == []:
                                     await ctx.send("BAD")
                                 else:
