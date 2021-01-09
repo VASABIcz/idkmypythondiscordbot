@@ -478,6 +478,12 @@ async def p(ctx, *, urlee=None, fp=None):
                         #ZKONTOLUJE POKUD JE VIDEO V CACHE, POKUD NE EXTRAHUJE INFORMACE A PRIDA HO PRO SNIZENI ODEZVY BOTA
                         if not urlee in cache or fp is True:
                             try:
+                                ###CONNECT
+                                if not is_connected(ctx):
+                                    channel = ctx.author.voice.channel.id
+                                    chl = await bot.fetch_channel(channel)
+                                    await chl.connect()
+
                                 ### I FUCKING DONT KNOW HOW THIS WORKS BUT IT DOES (: yoinked it from ofic bot
                                 #bruh just 2 random lines and it's async
                                 loop = asyncio.get_event_loop()
@@ -528,11 +534,6 @@ async def p(ctx, *, urlee=None, fp=None):
                                     with open('cache.json', 'w') as fe:
                                         json.dump(cache, fe)
 
-                                    ###CONNECT
-                                    if not is_connected(ctx):
-                                        channel = ctx.author.voice.channel.id
-                                        chl = await bot.fetch_channel(channel)
-                                        await chl.connect()
 
                                     ###SEND EMBED
                                     embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',colour=discord.Colour.from_rgb(re.randint(0, 255), 0,re.randint(0, 255)))
