@@ -28,15 +28,15 @@ loljs = {}
 # TODO BETER LINK VALIDATING/ CACHING
 # DONE
 # TODO volume controll command
-# nn
+# idk
 # TODO LEPSI LOOP SPRAVOVANI
-# nah
+# I LOST(like so fucking good) btw still in testing
 # TODO ODSTRANENI ERRORU PRI POSOUVANI BOTA MEZI CHANNELY(ciste esteticke)
-# nah
+# my senpai https://github.com/Rapptz/ fixed id UwU
 # TODO FIXOVANI MENSICH BUGU
 #
 # TODO skip_to
-# pls dont
+# idk, maybe with new loop handler
 # TODO crp playing status will update with pause/play
 # DONE
 # TODO CACHE ADD PLAYLIST SUPPORT
@@ -170,9 +170,9 @@ async def crep(gid, x):
     embed = discord.Embed(title=loljs[gid]["crpe"]['tit'],
                           url=loljs[gid]["crpe"]['URL_s'],
                           colour=discord.Colour.from_rgb(
-                              re.randrange(0, 255),
+                              re.randint(0, 255),
                               0,
-                              re.randrange(0, 255)))
+                              re.randint(0, 255)))
     embed.set_author(name='VASABI',
                      url='https://github.com/VASABIcz/Simple-discord-music-bot',
                      icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
@@ -286,12 +286,12 @@ async def que(ctx, nam=1):
 
     qee = loljs[ctx.guild.id]['que']
     embed = discord.Embed(title="QUE (:", description="Song que",
-                          colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
+                          colour=discord.Colour.from_rgb(re.randint(0, 255), 0, re.randint(0, 255)))
     embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                      icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
     for i in range(5):
         try:
-            embed.add_field(name=qee[int(i + (nam * 5) - 5)]['tit'], value=str(i + 1 + (nam * 5) - 5), inline=False)
+            embed.add_field(name=qee[int(i + (nam * 5) - 5)]['tit'], value=str(i + (nam * 5) - 5), inline=False)
         except:
             pass
 
@@ -311,9 +311,12 @@ async def r(ctx, ide):
     init(ctx)
     try:
         ide = int(ide)
-        await ctx.send(
-            "{} has been removed from que".format(loljs[ctx.guild.id]['que'][int(ide - 1)]['tit']))
-        del loljs[ctx.guild.id]['que'][int(ide - 1)]
+        if ide > 0:
+            await ctx.send(
+                "{} has been removed from que".format(loljs[ctx.guild.id]['que'][int(ide)]['tit']))
+            del loljs[ctx.guild.id]['que'][int(ide - 1)]
+        else:
+            await ctx.channel.send("U can't remove crp D: use skip")
     except:
         await ctx.channel.send('BAD D:')
 
@@ -410,7 +413,7 @@ async def crp(ctx):
         except:
             pass
         embed = discord.Embed(title=loljs[ctx.guild.id]["crpe"]['tit'], url=loljs[ctx.guild.id]["crpe"]['URL_s'],
-                              colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
+                              colour=discord.Colour.from_rgb(re.randint(0, 255), 0, re.randint(0, 255)))
         embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                          icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
         embed.set_thumbnail(url=loljs[ctx.guild.id]["crpe"]['thumb'])
@@ -529,7 +532,7 @@ async def p(ctx, *, urlee=None, fp=None):
                                         await chl.connect()
 
                                     ###SEND EMBED
-                                    embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',colour=discord.Colour.from_rgb(re.randrange(0, 255), 0,re.randrange(0, 255)))
+                                    embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',colour=discord.Colour.from_rgb(re.randint(0, 255), 0,re.randint(0, 255)))
                                     embed.set_author(name='VASABI',url='https://github.com/VASABIcz/Simple-discord-music-bot',icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
                                     embed.set_thumbnail(url=thumb)
                                     if loljs[ctx.guild.id]["crpe"]['tit']:
@@ -562,8 +565,8 @@ async def p(ctx, *, urlee=None, fp=None):
                             ###SEND EMBED
                             ###POSLE SONG KTERY SE PRDAL DO PORADI
                             embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',
-                                                  colour=discord.Colour.from_rgb(re.randrange(0, 255), 0,
-                                                                                 re.randrange(0, 255)))
+                                                  colour=discord.Colour.from_rgb(re.randint(0, 255), 0,
+                                                                                 re.randint(0, 255)))
                             embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                                              icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
                             embed.set_thumbnail(url=thumb)
@@ -590,20 +593,27 @@ async def p(ctx, *, urlee=None, fp=None):
                         if not voice.is_paused():
                             if not voice.is_playing():
                                 if is_connected(ctx):
-                                    loljs[ctx.guild.id]['voice_id'] = voice.channel.id
                                     if loljs[ctx.guild.id]['que']:
-
                                         ###LOOP
                                         ###SPRAVOVANI PRAVE HRANEHO SONGU
                                         loop = loljs[ctx.guild.id]['loop']
                                         if loop:
-                                            if urlee == '':
-                                                urlee = None
-                                            else:
-                                                lenght = len(loljs[ctx.guild.id]['que'])
+                                            if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
                                                 loljs[ctx.guild.id]["crp"] += 1
-                                                if loljs[ctx.guild.id]["crp"] == lenght:
+                                                if loljs[ctx.guild.id]["crp"] >= len(loljs[ctx.guild.id]['que']):
                                                     loljs[ctx.guild.id]["crp"] = 0
+                                        else:
+                                            if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
+                                                del loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]
+                                                if loljs[ctx.guild.id]["crp"] == len(loljs[ctx.guild.id]['que']):
+                                                    loljs[ctx.guild.id]["crp"] = 0
+                                    else:
+                                        loljs[ctx.guild.id]["crpe"]['tit'] = None
+                                        loljs[ctx.guild.id]["crpe"]['URL_s'] = None
+                                        loljs[ctx.guild.id]["crpe"]['thumb'] = None
+                                        loljs[ctx.guild.id]["crpe"]['URL'] = None
+
+                                    if loljs[ctx.guild.id]['que']:
 
                                         ###EXTRACT FROM JSON
                                         #EXTRAKCE POTREBNYCH VECI Z DICTIONARY/JSONU
@@ -611,10 +621,6 @@ async def p(ctx, *, urlee=None, fp=None):
                                         thumb = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['thumb']
                                         URL_s = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['URL_s']
                                         tit = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['tit']
-                                        ###HANDLE LOOP
-                                        if not loop:
-                                            del loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]
-
                                         ###STREAM AUDIO
                                         ###COD KTERY STREAMUJE VIDEO Z LINKU
                                         try:
@@ -641,14 +647,13 @@ async def p(ctx, *, urlee=None, fp=None):
                                                 embed = discord.Embed(title=loljs[ctx.guild.id]["crpe"]['tit'],
                                                                       url=loljs[ctx.guild.id]["crpe"]['URL_s'],
                                                                       colour=discord.Colour.from_rgb(
-                                                                          re.randrange(0, 255),
+                                                                          re.randint(0, 255),
                                                                           0,
-                                                                          re.randrange(0, 255)))
+                                                                          re.randint(0, 255)))
                                                 embed.set_author(name='VASABI',
                                                                  url='https://github.com/VASABIcz/Simple-discord-music-bot',
                                                                  icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
                                                 embed.set_thumbnail(url=loljs[ctx.guild.id]["crpe"]['thumb'])
-                                                embed.add_field(name='lenght', value='10:24', inline=True)
                                                 embed.add_field(name='status', value='playing', inline=False)
                                                 embed.add_field(name='commands', value='_', inline=False)
                                                 embed.add_field(name='⏸️/▶️', value='**`pause/resume`**', inline=True)
@@ -714,9 +719,9 @@ async def on_raw_reaction_add(payload):
                         embed = discord.Embed(title=loljs[gid]["crpe"]['tit'],
                                               url=loljs[gid]["crpe"]['URL_s'],
                                               colour=discord.Colour.from_rgb(
-                                                  re.randrange(0, 255),
+                                                  re.randint(0, 255),
                                                   0,
-                                                  re.randrange(0, 255)))
+                                                  re.randint(0, 255)))
                         embed.set_author(name='VASABI',
                                          url='https://github.com/VASABIcz/Simple-discord-music-bot',
                                          icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
@@ -740,9 +745,9 @@ async def on_raw_reaction_add(payload):
                         embed = discord.Embed(title=loljs[gid]["crpe"]['tit'],
                                               url=loljs[gid]["crpe"]['URL_s'],
                                               colour=discord.Colour.from_rgb(
-                                                  re.randrange(0, 255),
+                                                  re.randint(0, 255),
                                                   0,
-                                                  re.randrange(0, 255)))
+                                                  re.randint(0, 255)))
                         embed.set_author(name='VASABI',
                                          url='https://github.com/VASABIcz/Simple-discord-music-bot',
                                          icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
@@ -793,12 +798,13 @@ async def on_raw_reaction_add(payload):
                 nam = loljs[gid]['quem']['pg']
                 qee = loljs[gid]['que']
                 embed = discord.Embed(title="QUE (:", description="Song que",
-                                      colour=discord.Colour.from_rgb(re.randrange(0, 255), 0, re.randrange(0, 255)))
+                                      colour=discord.Colour.from_rgb(re.randint(0, 255), 0, re.randint(0, 255)))
                 embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                                  icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
                 for i in range(5):
+                    rov = i + (nam * 5) - 5
                     try:
-                        embed.add_field(name=qee[int(i + (nam * 5) - 5)]['tit'], value=str(i + 1 + (nam * 5) - 5),
+                        embed.add_field(name=qee[int(rov)]['tit'], value=str(rov + 1),
                                         inline=False)
                     except:
                         pass
@@ -807,32 +813,7 @@ async def on_raw_reaction_add(payload):
                 message = await chal.fetch_message(loljs[gid]['quem']['mid'])
                 await message.edit(embed=embed)
 
-###POKUD NEKDO MOVNE BOTA TAK NAVRATI HRAJICI SONG
-@bot.event
-async def on_voice_state_update(member, before, after):
-    global loljs
-    if after is None:
-        pass
-    else:
-        if before.channel != after.channel:
-            try:
-                gid = after.channel.guild.id
-                init(gid)
-                if member.id == bot.user.id:
-                    if loljs[gid]["crpe"]['URL_s'] is not None:
-                        if loljs[gid]['loop']:
-                            loljs[gid]['crp'] += -1
-                        else:
-                            loljs[gid]['que'].insert(0, {})
-                            loljs[gid]['que'][0]['URL'] = loljs[gid]["crpe"]['URL']
-                            loljs[gid]['que'][0]['URL_s'] = loljs[gid]["crpe"][
-                                'URL_s']
-                            loljs[gid]['que'][0]['thumb'] = loljs[gid]["crpe"][
-                                'thumb']
-                            loljs[gid]['que'][0]['tit'] = loljs[gid]["crpe"]['tit']
 
-            except:
-                print('I DUNO')
 ###NAPISE KDYZ JE BOT PRIPRAVEN K POUZIVANI
 @bot.event
 async def on_ready():
