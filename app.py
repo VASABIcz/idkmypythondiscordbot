@@ -45,7 +45,7 @@ loljs = {}
 # DONE
 # TODO force play(forces extracting frum url)
 # DONE
-
+# TODO cmd r if loop
 
 
 ###PRIDANI SERVRU DO DICTIONARY
@@ -121,7 +121,7 @@ def scrap(URL):
 
 
 ###COMAND PRO KONTROLU FUNKCNOSTI LINKU
-def validate(ctx, YDL_OPTIONS):
+async def validate(ctx, YDL_OPTIONS):
     ydl = YoutubeDL(YDL_OPTIONS)
     ###VALIDATE ALL LINKS WHILE PLAYING ANOTHER SONG TO BYPASS USER WAITING FOR VALIDATION
 
@@ -129,8 +129,8 @@ def validate(ctx, YDL_OPTIONS):
     if loljs[ctx.guild.id]['que']:
         for n in range(len(loljs[ctx.guild.id]['que'])):
             if scrap(loljs[ctx.guild.id]['que'][n]['URL']):
-                info = ydl.extract_info(loljs[ctx.guild.id]['que'][n]['URL_s'],
-                                        download=False)
+                loop = asyncio.get_event_loop()
+                info = await loop.run_in_executor(None, lambda: ydl.extract_info(loljs[ctx.guild.id]['que'][n]['URL_s'], download=False))
                 loljs[ctx.guild.id]['que'][n]['URL'] = info['url']
                 print('validated que')
 
@@ -142,9 +142,10 @@ def validate(ctx, YDL_OPTIONS):
                 try:
                     for n in range(len(filee[str(ctx.author.id)]['que'])):
                         if scrap(filee[str(ctx.author.id)]['que'][n]['URL']):
-                            info = ydl.extract_info(
-                                filee[str(ctx.author.id)]['que'][n]['URL_s'],
-                                download=False)
+                            loop = asyncio.get_event_loop()
+                            info = await loop.run_in_executor(None, lambda: ydl.extract_info(
+                                filee[str(ctx.author.id)]['que'][n]['URL_s'], download=False))
+
                             filee[str(ctx.author.id)]['que'][n]['URL'] = info['url']
                             with open('save.json', 'w') as fe:
                                 json.dump(filee, fe)
@@ -159,7 +160,8 @@ def validate(ctx, YDL_OPTIONS):
                 lil = list(filee)
                 for i in range(len(filee[lil[n]])):
                     if scrap(filee[lil[n]][i]['URL']):
-                        info = ydl.extract_info(filee[lil[n]][i]['URL_s'], download=False)
+                        info = await loop.run_in_executor(None, lambda: ydl.extract_info(
+                            filee[lil[n]][i]['URL_s'], download=False))
                         filee[lil[n]][i]['URL'] = info['url']
                         with open('cache.json', 'w') as fe:
                             json.dump(filee, fe)
@@ -290,8 +292,10 @@ async def que(ctx, nam=1):
     embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                      icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
     for i in range(5):
+        rov = i + (nam * 5) - 5
         try:
-            embed.add_field(name=qee[int(i + (nam * 5) - 5)]['tit'], value=str(i + (nam * 5) - 5), inline=False)
+            embed.add_field(name=qee[int(rov)]['tit'], value=str(rov),
+                            inline=False)
         except:
             pass
 
@@ -311,10 +315,10 @@ async def r(ctx, ide):
     init(ctx)
     try:
         ide = int(ide)
-        if ide > 0:
+        if ide >= 0:
             await ctx.send(
                 "{} has been removed from que".format(loljs[ctx.guild.id]['que'][int(ide)]['tit']))
-            del loljs[ctx.guild.id]['que'][int(ide - 1)]
+            del loljs[ctx.guild.id]['que'][int(ide)]
         else:
             await ctx.channel.send("U can't remove crp D: use skip")
     except:
@@ -365,7 +369,7 @@ async def load(ctx):
             f.write('{}')
             filee = json.load(f)
 
-    loljs[ctx.guild.id]['que'] = filee[str(idd)]['que']
+    loljs[ctx.guild.id]['que'].extend(filee[str(idd)]['que'])
 
     if not filee[str(idd)]['que']:
         await ctx.send("U didnt save any que D:")
@@ -385,7 +389,8 @@ async def load(ctx):
                                'default_search': 'auto',
                                'source_address': '0.0.0.0'}
                 ydl = YoutubeDL(YDL_OPTIONS)
-                info = ydl.extract_info(loljs[ctx.guild.id]['que'][0]['URL_s'], download=False)
+                loop = asyncio.get_event_loop()
+                info = await loop.run_in_executor(None, lambda: ydl.extract_info(loljs[ctx.guild.id]['que'][0]['URL_s'], download=False))
                 loljs[ctx.guild.id]['que'][0]['URL'] = info['url']
         await ctx.invoke(bot.get_command('p'), urlee='')
 
@@ -534,16 +539,15 @@ async def p(ctx, *, urlee=None, fp=None):
                                     with open('cache.json', 'w') as fe:
                                         json.dump(cache, fe)
 
-
                                     ###SEND EMBED
                                     embed = discord.Embed(title=tit, url=URL_s, description='Added to que:',colour=discord.Colour.from_rgb(re.randint(0, 255), 0,re.randint(0, 255)))
                                     embed.set_author(name='VASABI',url='https://github.com/VASABIcz/Simple-discord-music-bot',icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
                                     embed.set_thumbnail(url=thumb)
                                     if loljs[ctx.guild.id]["crpe"]['tit']:
-                                        embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
+                                        embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])-1))
                                     else:
                                         if loljs[ctx.guild.id]['loop']:
-                                            embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
+                                            embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])-1))
                                         else:
                                             embed.set_footer(text="Now playing")
                                     await ctx.send(embed=embed)
@@ -553,6 +557,12 @@ async def p(ctx, *, urlee=None, fp=None):
 
                         else:
                             for l in range(len(cache[urlee])):
+                                if l == 0:
+                                    if scrap(cache[urlee][0]['URL']):
+                                        loop = asyncio.get_event_loop()
+                                        info = await loop.run_in_executor(None, lambda: ydl.extract_info(cache[urlee][0]['URL_s'],
+                                                                                                         download=False))
+                                        cache[urlee][0]['URL'] = info['url']
                                 loljs[ctx.guild.id]['que'].append(cache[urlee][l])
 
                             #URL = cache[urlee][len(cache[urlee])-1]['URL']
@@ -575,10 +585,10 @@ async def p(ctx, *, urlee=None, fp=None):
                                              icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
                             embed.set_thumbnail(url=thumb)
                             if loljs[ctx.guild.id]["crpe"]['tit']:
-                                embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
+                                embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])-1))
                             else:
                                 if loljs[ctx.guild.id]['loop']:
-                                    embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])))
+                                    embed.set_footer(text="Position in que: {}".format(len(loljs[ctx.guild.id]['que'])-1))
                                 else:
                                     embed.set_footer(text="Now playing")
                             await ctx.send(embed=embed)
@@ -675,19 +685,25 @@ async def p(ctx, *, urlee=None, fp=None):
 
                                     else:
                                         await asyncio.sleep(0.1)#UDRZUJE ABY SE BOT NEPREHLTIL
-                                        validate(ctx, YDL_OPTIONS)#ZKONTROLUJE JESTLI JSOU LINKY K MUSIC FILU FUNKCI A UDRZUJE JE FUNKCNI
+                                        await validate(ctx, YDL_OPTIONS)#ZKONTROLUJE JESTLI JSOU LINKY K MUSIC FILU FUNKCI A UDRZUJE JE FUNKCNI
                                 else:
                                     await asyncio.sleep(0.1)
-                                    validate(ctx, YDL_OPTIONS)
+                                    await validate(ctx, YDL_OPTIONS)
                             else:
                                 await asyncio.sleep(0.1)
-                                validate(ctx, YDL_OPTIONS)
+                                await validate(ctx, YDL_OPTIONS)
                         else:
                             await asyncio.sleep(0.1)
-                            validate(ctx, YDL_OPTIONS)
+                            await validate(ctx, YDL_OPTIONS)
                     else:
                         await asyncio.sleep(0.1)
-                        validate(ctx, YDL_OPTIONS)
+                        await validate(ctx, YDL_OPTIONS)
+
+
+@p.error
+async def info_error(ctx, error):
+    chal = bot.get_channel(797834682476920852)
+    await chal.send(error)
 
 
 
@@ -808,7 +824,7 @@ async def on_raw_reaction_add(payload):
                 for i in range(5):
                     rov = i + (nam * 5) - 5
                     try:
-                        embed.add_field(name=qee[int(rov)]['tit'], value=str(rov + 1),
+                        embed.add_field(name=qee[int(rov)]['tit'], value=str(rov),
                                         inline=False)
                     except:
                         pass
