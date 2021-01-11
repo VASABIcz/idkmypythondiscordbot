@@ -9,6 +9,7 @@ import random as re
 import time
 import os
 from dotenv import load_dotenv
+from discord_webhook import DiscordWebhook
 
 load_dotenv('.env')
 PREF = os.environ['PREF']
@@ -46,6 +47,8 @@ loljs = {}
 # TODO force play(forces extracting frum url)
 # DONE
 # TODO cmd r if loop
+#
+# TODO dont accept bot @dd
 
 
 ###PRIDANI SERVRU DO DICTIONARY
@@ -160,6 +163,7 @@ async def validate(ctx, YDL_OPTIONS):
                 lil = list(filee)
                 for i in range(len(filee[lil[n]])):
                     if scrap(filee[lil[n]][i]['URL']):
+                        loop = asyncio.get_event_loop()
                         info = await loop.run_in_executor(None, lambda: ydl.extract_info(
                             filee[lil[n]][i]['URL_s'], download=False))
                         filee[lil[n]][i]['URL'] = info['url']
@@ -191,7 +195,7 @@ async def crep(gid, x):
     await message.edit(embed=embed)
 
 #PRESKOCENI PRAVE HRAJICIHO SONGU
-@bot.command(brief="skips a song")
+@bot.command(brief="skips a song", aliases=['sk', 's'])
 async def skip(ctx):
     voice = get(bot.voice_clients, guild=ctx.guild)
     if voice is not None:
@@ -201,7 +205,7 @@ async def skip(ctx):
         await ctx.send("nothing to skip (((((((((:")
 
 ###ZASMICKOVANI RADY SONGU
-@bot.command(brief="loop a song")
+@bot.command(brief="loop a song", aliases=['lq', 'loop', 'loopqueue'])
 async def loopq(ctx):
     global loljs
     init(ctx)
@@ -210,7 +214,7 @@ async def loopq(ctx):
     await ctx.send("que has been looped (:")
 
 ###ODSMICKOVANI RADY SONGU
-@bot.command(brief="stops loop a song")
+@bot.command(brief="stops loop a song", aliases=['ld', 'lqd', 'unloop', 'loopd'])
 async def loopqd(ctx):
     global loljs
     init(ctx)
@@ -219,7 +223,7 @@ async def loopqd(ctx):
     await ctx.send("que has been un looped (:")
 
 ###COMMAND PRO VICISTENI SONGU
-@bot.command(brief="stops all music")
+@bot.command(brief="stops all music", aliases=['del'])
 async def oof(ctx):
     global loljs
     init(ctx)
@@ -238,7 +242,7 @@ async def hello(ctx):
     await ctx.channel.send("hello")
 
 #PRIPOJI NEBO PREPOJI BOTA
-@bot.command(brief="...")
+@bot.command(brief="...", aliases=['c', 'cn', 'join'])
 async def connect(ctx):
     channel = ctx.author.voice.channel
     if is_connected(ctx):
@@ -249,16 +253,8 @@ async def connect(ctx):
         await channel.connect()
 
 
-@bot.command(brief="...")
-async def c(ctx):
-    await ctx.invoke(bot.get_command('connect'))
-
-@bot.command(brief="...")
-async def join(ctx):
-    await ctx.invoke(bot.get_command('connect'))
-
 #ODPOJI BOTA
-@bot.command(brief="disconects bot from voice channel")
+@bot.command(brief="disconects bot from voice channel", aliases=['dc', 'disconnect'])
 async def d(ctx):
     server = ctx.message.guild.voice_client
     voice = get(bot.voice_clients, guild=ctx.guild)
@@ -267,12 +263,8 @@ async def d(ctx):
     await ctx.send("U DcD me D:")
 
 
-@bot.command(brief="disconects bot from voice channel")
-async def dc(ctx):
-    await ctx.invoke(bot.get_command('d'))
-
 ###VIPISE SONGY V RADE
-@bot.command(brief="shows songs in que", help="just .que LOOOOL")
+@bot.command(brief="shows songs in que", help="just .que LOOOOL", aliases=['queue', 'q'])
 async def que(ctx, nam=1):
     global loljs
     init(ctx)
@@ -286,9 +278,9 @@ async def que(ctx, nam=1):
     if nam < 1:
         nam = 1
 
-    qee = loljs[ctx.guild.id]['que']
     embed = discord.Embed(title="QUE (:", description="Song que",
                           colour=discord.Colour.from_rgb(re.randint(0, 255), 0, re.randint(0, 255)))
+    qee = loljs[ctx.guild.id]['que']
     embed.set_author(name='VASABI', url='https://github.com/VASABIcz/Simple-discord-music-bot',
                      icon_url='https://i.ytimg.com/vi_webp/xeA7VQE_R1k/maxresdefault.webp')
     for i in range(5):
@@ -309,7 +301,7 @@ async def que(ctx, nam=1):
     loljs[ctx.guild.id]['quem']['pg'] = nam
 
 ###COMMAND PRO ODSTRANENI SONGU Z RADY
-@bot.command(brief="remove 1 specific song from que ", help=".r number of song (use .que)")
+@bot.command(brief="remove 1 specific song from que ", help=".r number of song (use .que)", aliases=['remove', 're'])
 async def r(ctx, ide):
     global loljs
     init(ctx)
@@ -324,14 +316,8 @@ async def r(ctx, ide):
     except:
         await ctx.channel.send('BAD D:')
 
-
-@bot.command(brief="shows songs in que", help="just .que LOOOOL")
-async def q(ctx, nam=1):
-    await ctx.invoke(bot.get_command('que'), nam=nam)
-
-
 ###ULOZI UZIVATELI PLAYLIST
-@bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
+@bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL", aliases=['dp','save'])
 async def dump(ctx):
     global loljs
     init(ctx)
@@ -354,7 +340,7 @@ async def dump(ctx):
         json.dump(filee, f)
 
 ###NACTE UZIVATELEM ULOZENY PLAYLIST
-@bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
+@bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL",aliases=['lod'])
 async def load(ctx):
     global loljs
     idd = ctx.author.id
@@ -395,17 +381,12 @@ async def load(ctx):
         await ctx.invoke(bot.get_command('p'), urlee='')
 
 
-@bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
-async def play(ctx, *, urlee=None):
-    await ctx.invoke(bot.get_command('p'), urlee=urlee)
-
-
-@bot.command(brief="plays and updates song in cache", help="song name or URL")
+@bot.command(brief="plays and updates song in cache", help="song name or URL", aliases=['forceplay','forcep'])
 async def fp(ctx, *, urlee=None):
     await ctx.invoke(bot.get_command('p'), urlee=urlee, fp=True)
 
 
-@bot.command(brief="Plays a video or playlist from a link", help="song name or URL")
+@bot.command(brief="Plays a video or playlist from a link", help="song name or URL", aliases=['np','nowplaying', 'playing'])
 async def crp(ctx):
     init(ctx)
     global loljs
@@ -438,7 +419,7 @@ async def crp(ctx):
         await ctx.send("Nothing is playing")
 
 
-@bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL")
+@bot.command(brief="Plays a single video, from a youtube URL", help="song name or URL", aliases=['play', 'jamm', 'pl'])
 async def p(ctx, *, urlee=None, fp=None):
     if urlee is None:
         await ctx.send(" U need to give a song name or URL (:")
@@ -700,12 +681,10 @@ async def p(ctx, *, urlee=None, fp=None):
                         await validate(ctx, YDL_OPTIONS)
 
 
-@p.error
-async def info_error(ctx, error):
-    chal = bot.get_channel(797834682476920852)
-    await chal.send(error)
-
-
+@bot.event
+async def on_command_error(ctx, error):
+    webhook = DiscordWebhook(url='https://discord.com/api/webhooks/797142718777262121/ciIaNQ-hBMIS9ZGbCCpPoDSTT1lvKQukYy4RIJTtxKB3Ue9k_RIvh-FFAR1sUKk6ooaV', content=f'{ctx.author} \n {ctx.guild} \n {str(error)}')
+    response = webhook.execute()
 
 
 ###INTERACRIVE CONTROL HANDELING
