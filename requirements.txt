@@ -5,3 +5,4 @@ PyNaCl
 aiohttp
 opuslib
 python-dotenv
+discord-webhook
