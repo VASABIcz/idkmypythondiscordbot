@@ -99,7 +99,7 @@ class music(commands.Cog):
                     print('validated que')
 
         # VALIDATE SAVE
-        with open('../save.json', 'r+') as f:
+        with open('save.json', 'r+') as f:
             filee = json.load(f)
             if filee != {}:
                 if str(ctx.author.id) in filee:
@@ -112,13 +112,13 @@ class music(commands.Cog):
                                         filee[str(ctx.author.id)]['que'][n]['URL_s'], download=False))
 
                                     filee[str(ctx.author.id)]['que'][n]['URL'] = info['url']
-                                    with open('../save.json', 'w') as fe:
+                                    with open('save.json', 'w') as fe:
                                         json.dump(filee, fe)
                                     print('validated save')
                         except:
                             pass
         # VALIDATE CACHE
-        with open('../cache.json', 'r+') as f:
+        with open('cache.json', 'r+') as f:
             filee = json.load(f)
             if filee != {}:
                 for n in range(len(filee)):
@@ -129,7 +129,7 @@ class music(commands.Cog):
                             info = await loop.run_in_executor(None, lambda: ydl.extract_info(
                                 filee[lil[n]][i]['URL_s'], download=False))
                             filee[lil[n]][i]['URL'] = info['url']
-                            with open('../cache.json', 'w') as fe:
+                            with open('cache.json', 'w') as fe:
                                 json.dump(filee, fe)
                             print('validated cache {}'.format(lil[n]))
 
@@ -309,10 +309,10 @@ class music(commands.Cog):
         ide = ctx.author.id
 
         try:
-            with open('../save.json', 'r+') as f:
+            with open('save.json', 'r+') as f:
                 filee = json.load(f)
         except:
-            with open('../save.json', 'w+') as f:
+            with open('save.json', 'w+') as f:
                 f.write('{}')
                 filee = json.load(f)
 
@@ -321,7 +321,7 @@ class music(commands.Cog):
             filee[str(ide)]['que'] = []
         filee[str(ide)]['que'] = loljs[ctx.guild.id]['que']
 
-        with open('../save.json', 'w') as f:
+        with open('save.json', 'w') as f:
             json.dump(filee, f)
 
     ###NACTE UZIVATELEM ULOZENY PLAYLIST
@@ -333,10 +333,10 @@ class music(commands.Cog):
         self.init(ctx)
 
         try:
-            with open('../save.json', 'r+') as f:
+            with open('save.json', 'r+') as f:
                 filee = json.load(f)
         except:
-            with open('../save.json', 'w+') as f:
+            with open('save.json', 'w+') as f:
                 f.write('{}')
                 filee = json.load(f)
 
@@ -435,7 +435,7 @@ class music(commands.Cog):
                 with YoutubeDL(YDL_OPTIONS) as ydl:
                     if urlee != "":
                         # NACTE CACHE PRO SONGY
-                        with open('../cache.json', 'r+') as f:
+                        with open('cache.json', 'r+') as f:
                             cache = json.load(f)
                             # ZKONTOLUJE POKUD JE VIDEO V CACHE, POKUD NE EXTRAHUJE INFORMACE A PRIDA HO PRO SNIZENI ODEZVY BOTA
                             if not urlee in cache or fp is True:
@@ -503,7 +503,7 @@ class music(commands.Cog):
                                             cache[urlee][len(cache[urlee]) - 1]['tit'] = tit
                                             cache[urlee][len(cache[urlee]) - 1]['thumb'] = thumb
                                             cache[urlee][len(cache[urlee]) - 1]['URL_s'] = URL_s
-                                        with open('../cache.json', 'w') as fe:
+                                        with open('cache.json', 'w') as fe:
                                             json.dump(cache, fe)
                                 except:
                                     pass
