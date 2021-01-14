@@ -1,2 +1,2 @@
 # JUST SOME BOT TO PLAY MUSIC IDK
-yes
+Used to host on heroku 
