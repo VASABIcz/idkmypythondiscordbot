@@ -39,12 +39,12 @@ async def ping(ctx):
     await ctx.send(f'Pong! {bot.latency}')
 
 
-@bot.event
-async def on_command_error(ctx, error):
-    webhook = DiscordWebhook(
-        url='https://discord.com/api/webhooks/797142718777262121/ciIaNQ-hBMIS9ZGbCCpPoDSTT1lvKQukYy4RIJTtxKB3Ue9k_RIvh-FFAR1sUKk6ooaV',
-        content=f'{ctx.author} \n {ctx.guild} \n {str(error)}')
-    response = webhook.execute()
+#@bot.event
+#async def on_command_error(ctx, error):
+#    webhook = DiscordWebhook(
+#        url='https://discord.com/api/webhooks/797142718777262121/ciIaNQ-hBMIS9ZGbCCpPoDSTT1lvKQukYy4RIJTtxKB3Ue9k_RIvh-FFAR1sUKk6ooaV',
+#        content=f'{ctx.author} \n {ctx.guild} \n {str(error)}')
+#    response = webhook.execute()
 
 
 ###NAPISE KDYZ JE BOT PRIPRAVEN K POUZIVANI
