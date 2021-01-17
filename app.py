@@ -3,7 +3,6 @@ from discord.ext import commands
 import os
 from dotenv import load_dotenv
 from os import listdir
-from discord_webhook import DiscordWebhook
 from constant import *
 
 # TODO Checks guild only ...
@@ -27,9 +26,9 @@ async def reload(ctx, name):
     await ctx.channel.send('cog reloaded')
 
 
-@bot.command(brief="simple eval")
+@bot.command(brief="simple eval", name='eval')
 @commands.is_owner()
-async def eval(ctx, *, eve):
+async def evale(ctx, *, eve):
     evee = (str(eval(eve)))
     await ctx.channel.send(evee)
 
@@ -57,7 +56,7 @@ async def on_ready():
     print('---------------------')
     activity = discord.Game(name=f"{PREF}help")
     await bot.change_presence(status=discord.Status.online, activity=activity)
-    files = listdir('C:\pythonProject\Discord_bot\COG_BOT\cogs')
+    files = listdir('cogs')
     for n in files:
         if n != '__pycache__':
             if not '#' in n:
