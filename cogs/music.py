@@ -16,6 +16,7 @@ class music(commands.Cog):
     global loljs
     global YDL_OPTIONS
     global FFMPEG_OPTIONS
+    print(FFMPEG_OPTIONS)
 
     async def init(self, ctx):
         if isinstance(ctx, int):
@@ -198,7 +199,7 @@ class music(commands.Cog):
         await ctx.send("que has been un looped (:")
 
     ###COMMAND PRO VICISTENI SONGU
-    @commands.command(brief="stops all music", aliases=['del', 'clear'])
+    @commands.command(brief="stops all music", aliases=['del', 'clear', 'stop'])
     async def oof(self, ctx):
 
         await self.init(ctx)
@@ -471,11 +472,11 @@ class music(commands.Cog):
                                             tit = loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]['tit']
                                             ###STREAM AUDIO
                                             ###COD KTERY STREAMUJE VIDEO Z LINKU
-                                            try:
-                                                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                                            except:
-                                                await asyncio.sleep(0.5)
-                                                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+                                            #try:
+                                            voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+                                            #except:
+                                            #    await asyncio.sleep(0.5)
+                                            #    voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                                             voice.source = discord.PCMVolumeTransformer(voice.source)
                                             voice.source.volume = 0.01
                                             voice.is_playing()
@@ -492,15 +493,12 @@ class music(commands.Cog):
                                             if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
                                                 try:
                                                     chal = self.bot.get_channel(int(loljs[ctx.guild.id]['rpm']['chid']))
-                                                    message = await chal.fetch_message(
-                                                        loljs[ctx.guild.id]['rpm']['mid'])
+                                                    message = await chal.fetch_message(loljs[ctx.guild.id]['rpm']['mid'])
                                                     await message.edit(embed=await self.embed_crp(ctx.guild.id, 'playing'))
                                                 except:
                                                     pass
                                             else:
                                                 await self.validate(ctx,YDL_OPTIONS)
-
-
                                         else:
                                             #await asyncio.sleep(0.1)  # UDRZUJE ABY SE BOT NEPREHLTIL
                                             await self.validate(ctx,YDL_OPTIONS)  # ZKONTROLUJE JESTLI JSOU LINKY K MUSIC FILU FUNKCI A UDRZUJE JE FUNKCNI
