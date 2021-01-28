@@ -8,53 +8,54 @@ import asyncio
 import random as re
 import time
 from constant import *
+global loljs
 
 class music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
     global loljs
     global YDL_OPTIONS
     global FFMPEG_OPTIONS
-    print(FFMPEG_OPTIONS)
 
     async def init(self, ctx):
-        if isinstance(ctx, int):
             if ctx not in loljs:
-                loljs[ctx] = {}
-                loljs[ctx]['loop'] = False
-                loljs[ctx]['que'] = []
-                loljs[ctx]["crp"] = 0
-                loljs[ctx]["crpe"] = {}
-                loljs[ctx]["crpe"]['tit'] = None
-                loljs[ctx]["crpe"]['URL_s'] = None
-                loljs[ctx]["crpe"]['thumb'] = None
-                loljs[ctx]["crpe"]['URL'] = None
-                loljs[ctx]['rpm'] = {}
-                loljs[ctx]['rpm']['mid'] = None
-                loljs[ctx]['rpm']['chid'] = None
-                loljs[ctx]['quem'] = {}
-                loljs[ctx]['quem']['mid'] = None
-                loljs[ctx]['quem']['chid'] = None
-                loljs[ctx]['quem']['pg'] = None
-        else:
-            if ctx.guild.id not in loljs:
-                loljs[ctx.guild.id] = {}
-                loljs[ctx.guild.id]['loop'] = False
-                loljs[ctx.guild.id]['que'] = []
-                loljs[ctx.guild.id]["crp"] = 0
-                loljs[ctx.guild.id]["crpe"] = {}
-                loljs[ctx.guild.id]["crpe"]['tit'] = None
-                loljs[ctx.guild.id]["crpe"]['URL_s'] = None
-                loljs[ctx.guild.id]["crpe"]['thumb'] = None
-                loljs[ctx.guild.id]["crpe"]['URL'] = None
-                loljs[ctx.guild.id]['rpm'] = {}
-                loljs[ctx.guild.id]['rpm']['mid'] = None
-                loljs[ctx.guild.id]['rpm']['chid'] = None
-                loljs[ctx.guild.id]['quem'] = {}
-                loljs[ctx.guild.id]['quem']['mid'] = None
-                loljs[ctx.guild.id]['quem']['chid'] = None
-                loljs[ctx.guild.id]['quem']['pg'] = None
+                if isinstance(ctx, int):
+                    if not ctx in loljs:
+                        loljs[ctx] = {}
+                        loljs[ctx]['loop'] = False
+                        loljs[ctx]['que'] = []
+                        loljs[ctx]["crp"] = 0
+                        loljs[ctx]["crpe"] = {}
+                        loljs[ctx]["crpe"]['tit'] = None
+                        loljs[ctx]["crpe"]['URL_s'] = None
+                        loljs[ctx]["crpe"]['thumb'] = None
+                        loljs[ctx]["crpe"]['URL'] = None
+                        loljs[ctx]['rpm'] = {}
+                        loljs[ctx]['rpm']['mid'] = None
+                        loljs[ctx]['rpm']['chid'] = None
+                        loljs[ctx]['quem'] = {}
+                        loljs[ctx]['quem']['mid'] = None
+                        loljs[ctx]['quem']['chid'] = None
+                        loljs[ctx]['quem']['pg'] = None
+                else:
+                    if not ctx.guild.id in loljs:
+                        loljs[ctx.guild.id] = {}
+                        loljs[ctx.guild.id]['loop'] = False
+                        loljs[ctx.guild.id]['que'] = []
+                        loljs[ctx.guild.id]["crp"] = 0
+                        loljs[ctx.guild.id]["crpe"] = {}
+                        loljs[ctx.guild.id]["crpe"]['tit'] = None
+                        loljs[ctx.guild.id]["crpe"]['URL_s'] = None
+                        loljs[ctx.guild.id]["crpe"]['thumb'] = None
+                        loljs[ctx.guild.id]["crpe"]['URL'] = None
+                        loljs[ctx.guild.id]['rpm'] = {}
+                        loljs[ctx.guild.id]['rpm']['mid'] = None
+                        loljs[ctx.guild.id]['rpm']['chid'] = None
+                        loljs[ctx.guild.id]['quem'] = {}
+                        loljs[ctx.guild.id]['quem']['mid'] = None
+                        loljs[ctx.guild.id]['quem']['chid'] = None
+                        loljs[ctx.guild.id]['quem']['pg'] = None
+
 
 
     async def is_connected(self, ctx):
@@ -183,7 +184,6 @@ class music(commands.Cog):
     ###ZASMICKOVANI RADY SONGU
     @commands.command(brief="loop a song", aliases=['lq', 'loop', 'loopqueue'])
     async def loopq(self, ctx):
-
         await self.init(ctx)
 
         loljs[ctx.guild.id]['loop'] = True
@@ -192,7 +192,6 @@ class music(commands.Cog):
     ###ODSMICKOVANI RADY SONGU
     @commands.command(brief="stops loop a song", aliases=['ld', 'lqd', 'unloop', 'loopd'])
     async def loopqd(self, ctx):
-
         await self.init(ctx)
 
         loljs[ctx.guild.id]['loop'] = False
@@ -201,7 +200,6 @@ class music(commands.Cog):
     ###COMMAND PRO VICISTENI SONGU
     @commands.command(brief="stops all music", aliases=['del', 'clear', 'stop'])
     async def oof(self, ctx):
-
         await self.init(ctx)
 
         voice = get(self.bot.voice_clients, guild=ctx.guild)
@@ -240,6 +238,7 @@ class music(commands.Cog):
     ###VIPISE SONGY V RADE
     @commands.command(brief="shows songs in que", help="just .que LOOOOL", aliases=['queue', 'q'])
     async def que(self, ctx, nam=1):
+        global loljs
         try:
 
             await self.init(ctx)
@@ -266,7 +265,6 @@ class music(commands.Cog):
     @commands.command(brief="remove 1 specific song from que ", help=".r number of song (use .que)",
                  aliases=['remove', 're'])
     async def r(self, ctx, ide):
-
         await self.init(ctx)
         try:
             ide = int(ide)
@@ -293,7 +291,6 @@ class music(commands.Cog):
                  aliases=['np', 'nowplaying', 'playing'])
     async def crp(self, ctx):
         await self.init(ctx)
-
         if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
             try:
                 if loljs[ctx.guild.id]['rpm']['chid'] is not None:
@@ -315,18 +312,14 @@ class music(commands.Cog):
     @commands.command(brief="Plays a single video, from a youtube URL", help="song name or URL",
                  aliases=['play', 'jamm', 'pl'])
     async def p(self, ctx, *, urlee=None, fp=None):
+        await self.init(ctx)
         if urlee is None:
             await ctx.send(" U need to give a song name or URL (:")
         else:
-
-
-            await self.init(ctx)
-
             if ctx.author.voice is None:
                 await ctx.send("Ur not connected to voice channel")
             else:
 
-                await self.init(ctx)
                 ###LIBRARY PREZ KTEROU SE EXTRAHUJI INFORMACE O VIDEU
                 with YoutubeDL(YDL_OPTIONS) as ydl:
                     if urlee != "":
@@ -427,7 +420,6 @@ class music(commands.Cog):
                                 if not await self.is_connected(ctx):
                                     channel = ctx.author.voice.channel
                                     await channel.connect()
-
                             ###SEND EMBED
                             ###POSLE SONG KTERY SE PRDAL DO PORAD
                             await self.embed_ns(ctx, tit, URL_s, thumb)
@@ -450,18 +442,21 @@ class music(commands.Cog):
                                             if loop:
                                                 if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
                                                     loljs[ctx.guild.id]["crp"] += 1
-                                                    if loljs[ctx.guild.id]["crp"] >= len(loljs[ctx.guild.id]['que']):
+                                                    if loljs[ctx.guild.id]["crp"] >= len(
+                                                            loljs[ctx.guild.id]['que']):
                                                         loljs[ctx.guild.id]["crp"] = 0
                                             else:
                                                 if loljs[ctx.guild.id]["crpe"]['tit'] is not None:
                                                     del loljs[ctx.guild.id]['que'][loljs[ctx.guild.id]["crp"]]
-                                                    if loljs[ctx.guild.id]["crp"] == len(loljs[ctx.guild.id]['que']):
+                                                    if loljs[ctx.guild.id]["crp"] == len(
+                                                            loljs[ctx.guild.id]['que']):
                                                         loljs[ctx.guild.id]["crp"] = 0
                                         else:
                                             loljs[ctx.guild.id]["crpe"]['tit'] = None
                                             loljs[ctx.guild.id]["crpe"]['URL_s'] = None
                                             loljs[ctx.guild.id]["crpe"]['thumb'] = None
                                             loljs[ctx.guild.id]["crpe"]['URL'] = None
+                                            break
 
                                         if loljs[ctx.guild.id]['que']:
                                             ###EXTRACT FROM JSON
@@ -473,12 +468,13 @@ class music(commands.Cog):
                                             ###STREAM AUDIO
                                             ###COD KTERY STREAMUJE VIDEO Z LINKU
                                             #try:
+                                            voice = get(self.bot.voice_clients, guild=ctx.guild)
                                             voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                                             #except:
                                             #    await asyncio.sleep(0.5)
                                             #    voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                                             voice.source = discord.PCMVolumeTransformer(voice.source)
-                                            voice.source.volume = 0.01
+                                            voice.source.volume = 0.05
                                             voice.is_playing()
 
                                             ###SET CRP SONG
