@@ -342,11 +342,11 @@ class music(commands.Cog):
                 x.set()
 
             while True:
+                x.clear()
                 if loljs[ctx.guild.id]['que']:
                     f = open('bcache.json', 'r+')
                     cache = json.load(f)
                     voice = get(self.bot.voice_clients, guild=ctx.guild)
-                    x.clear()
                     fid = loljs[ctx.guild.id]
                     ###LOOP
                     ###SPRAVOVANI PRAVE HRANEHO SONGU
