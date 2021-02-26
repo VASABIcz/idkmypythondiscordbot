@@ -245,11 +245,15 @@ class music(commands.Cog):
         urlee.strip()
         if not urlee in list(cache) and not urlee in list(index) or fp is True:
             loop = asyncio.get_event_loop()
-            info = await loop.run_in_executor(None,
-                                              lambda: ydl.extract_info(urlee, download=False))
+            try:
+                info = await loop.run_in_executor(None, lambda: ydl.extract_info(urlee, download=False))
+            except:
+                await ctx.channel.send('BAD D:')
+                return
             #print(info)
             #f = open('info.json', 'w+')
             #json.dump(f, info)
+
             if info is None:
                 await ctx.send("BAD")
                 return
