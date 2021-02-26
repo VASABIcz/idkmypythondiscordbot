@@ -18,7 +18,7 @@ YDL_OPTIONS = {
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
-    'ignoreerrors': True,
+    'ignoreerrors': False,
     'logtostderr': False,
     'quiet': True,
     'no_warnings': True,
@@ -98,43 +98,36 @@ async def scrap(URL):
             return False
 
 
-async def ahoj(n, lil, filee, ydl):
-    if not "//cf-" in filee[lil[n]]['URL']:
-        if await scrap(filee[lil[n]]['URL']):
+async def ahoj(n, lil, cache, ydl, index):
+    if not "//cf-" in cache[lil[n]]['URL']:
+        if await scrap(cache[lil[n]]['URL']):
             loop = asyncio.get_event_loop()
-            info = await loop.run_in_executor(None, lambda: ydl.extract_info(filee[lil[n]]['URL_s'], download=False))
+            info = await loop.run_in_executor(None, lambda: ydl.extract_info(cache[lil[n]]['URL_s'], download=False))
             if info is None:
-                del filee[lil[n]]
+                del cache[lil[n]]
+                index = index.replace(f'"{lil[n]}", ').replace(f', "{lil[n]}"').replace(f'"{lil[n]}"')
+                print(index)
                 return
-            filee[lil[n]]['URL'] = info['url']
+            cache[lil[n]]['URL'] = info['url']
             with open('bcache.json', 'w+') as fe:
-                json.dump(filee, fe)
+                json.dump(cache, fe)
+            with open('bindex.json', 'w+') as fe:
+                json.dump(index, fe)
 
-            # print(f'validated cache {lil[n]}')
-            # if str(requests.get(filee[lil[n]]['URL'])) == "<Response [403]>":
-            #    loop = asyncio.get_event_loop()
-            #    info = await loop.run_in_executor(None, lambda: ydl.extract_info(filee[lil[n]]['URL_s'], download=False))
-            #    if info is None:
-            #        del filee[lil[n]]
-            #        return
-            #    filee[lil[n]]['URL'] = info['url']
-            #    with open('cache.json', 'w') as fe:
-            #        json.dump(filee, fe)
-            #    print(f'validated cache {lil[n]}')
 
 ###COMAND PRO KONTROLU FUNKCNOSTI LINKU
 async def validate(bot, opt):
     ydl = YoutubeDL(opt)
-    ###VALIDATE ALL LINKS WHILE PLAYING ANOTHER SONG TO BYPASS USER WAITING FOR VALIDATION
-
-    # VALIDATE CACHE
     with open('bcache.json', 'r+') as f:
-        filee = json.load(f)
-    if filee != {}:
-        lil = list(filee)
-        for n in range(len(filee)):
+        cache = json.load(f)
+    with open('bindex.json', 'r+') as f:
+        index = json.load(f)
+
+    if cache != {}:
+        lil = list(cache)
+        for n in range(len(cache)):
             try:
-                bot.loop.create_task(ahoj(n, lil, filee, ydl))
+                bot.loop.create_task(ahoj(n, lil, cache, ydl, index))
             except:
                 pass
 
